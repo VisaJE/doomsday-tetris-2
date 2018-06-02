@@ -22,17 +22,21 @@ public:
 	virtual ~Grid();
 	bool lost = false;
 	bool isThere(int h, int w);
+	long getPoints();
+	int droppedAmount();
 	bool tick();
 	void moveL();
 	void moveR();
 	void rotate();
-	int wholeDrop();
+	void wholeDrop();
 	bool addBlock(Block block);
 	void refresh();
 	void wholeTick();
 	void printGrid();
 	typedef void (Grid::*GridFunc)(void);
 private:
+	long points = 0;
+	int blocksDropped = 0;
 	StaticBlock staticBlock;
 	UberBlockifier blockGen;
 	Block dropBlock;

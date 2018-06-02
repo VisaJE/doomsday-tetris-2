@@ -35,6 +35,15 @@ bool Grid::isThere(int h, int w) {
 }
 
 
+long Grid::getPoints() {
+	return points;
+}
+
+
+int Grid::droppedAmount() {
+	return blocksDropped;
+}
+
 bool Grid::tick() {
 	if (dropBlock.height + blockPos[0] >= height) {return false;}
 	else if (!staticBlock.tryAdd(dropBlock, blockPos[0]+1, blockPos[1])) {return false;}
@@ -100,6 +109,7 @@ bool Grid::addBlock(Block block) {
 			}
 		}
 	}
+	blocksDropped += 1;
 	return true;
 }
 
@@ -166,12 +176,12 @@ bool Grid::slide(int y, int x, int l) {
 }
 
 
-int Grid::wholeDrop() {
+void Grid::wholeDrop() {
 	int p = 0;
 	while (tick()) {
 		p++;
 	}
-	return p;
+	points += p*5*dropBlock.mass;
 }
 
 
@@ -182,7 +192,7 @@ void Grid::wholeTick() {
 			lost = true;
 		}
 	}
-	this->printGrid();
+	points += dropBlock.mass;
 }
 
 

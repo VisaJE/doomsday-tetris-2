@@ -21,17 +21,17 @@ using namespace tet;
 
 int main()  {
 
-	// Initialize SDL
+	// Initialise SDL
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		cout << "FAIL" << endl;
 		return 1;
 	}
 
-	// Initialize Screen
+	// Initialise Screen
 	Screen screen = Screen();
 
-	// Initialize game
+	// Initialise game
 	cout << "Uber thing" << endl;
 	UberBlockifier blockGen(Conf::boardWidth);
 	// Game grid
@@ -39,7 +39,7 @@ int main()  {
 	cout << "grid thing" << endl;
 	Grid gameGrid = Grid(g, blockGen);
 
-	// Initialize game handler
+	// Initialise game handler
 	Events eventHandler = Events(screen, gameGrid);
 	eventHandler.init();
 	SDL_Quit();
