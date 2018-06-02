@@ -98,17 +98,19 @@ void Grid::moveR() {
 
 bool Grid::addBlock(Block block) {
 	staticBlock.refresh(grid);
+	points = pow(staticBlock.trim(), 1.5)*10;
 	dropBlock = block;
 	blockPos[0] = 0;
 	blockPos[1] = (width - block.width)/2;
 	if (!staticBlock.tryAdd(dropBlock, 0, blockPos[1])) {return false;}
-	for (int i=dropBlock.height-1;i>=0;i--) {
+/*	for (int i=dropBlock.height-1;i>=0;i--) {
 		for (int j=dropBlock.width-1;j>=0;j--) {
 			if (dropBlock.isThere(i,j)) {
 				grid[(i + blockPos[0])*width + j+blockPos[1]] = true;
 			}
 		}
-	}
+	}*/
+	refresh();
 	blocksDropped += 1;
 	return true;
 }
@@ -186,9 +188,8 @@ void Grid::wholeDrop() {
 
 
 void Grid::wholeTick() {
-	cout << "WholeTick happens!" << endl;
 	if (!tick()) {
-		if (!addBlock(blockGen.getABlock())) {
+		if (!addBlock(blockGen.getRandom())) {
 			lost = true;
 		}
 	}

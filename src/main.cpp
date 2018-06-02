@@ -28,12 +28,14 @@ int main()  {
 		return 1;
 	}
 
-	// Initialise Screen
+	// Initialize Screen
 	Screen screen = Screen();
+
 
 	// Initialise game
 	cout << "Uber thing" << endl;
 	UberBlockifier blockGen(Conf::boardWidth);
+
 	// Game grid
 	vector<bool> g(Conf::boardWidth*Conf::boardHeight, false);
 	cout << "grid thing" << endl;
@@ -41,6 +43,10 @@ int main()  {
 
 	// Initialise game handler
 	Events eventHandler = Events(screen, gameGrid);
+
+	// Unicode translation for key events
+	int SDL_EnableUNICODE(1);
+
 	eventHandler.init();
 	SDL_Quit();
 	cout << "Bye." << endl;

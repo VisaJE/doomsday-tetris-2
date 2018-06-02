@@ -25,13 +25,14 @@ public:
 	bool quit;
 	Grid g;
 	void init();
-	Uint32 currentInterval = 300;
-	int getDirection();
+	Uint32 currentInterval = 1000;
 	std::queue<Grid::GridFunc> callQue;
 private:
 	SDL_Event event;
 	Screen screen;
-	int direction = 0;
+	bool sPressed = false;
+	bool aPressed = false;
+	bool dPressed = false;
 	void setDropSpeed();
 
 };

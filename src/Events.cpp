@@ -34,13 +34,7 @@ Events::~Events() {
 }
 
 
-int Events::getDirection() {
-	return direction;
-}
-
-
 Uint32 ticker(Uint32 interval, void * arg) {
-	cout << "ticking." << endl;
 	Events *event = (Events*)arg;
 	if (event->g.lost || event->paused || event->quit) {
 		return 0;
@@ -51,17 +45,22 @@ Uint32 ticker(Uint32 interval, void * arg) {
 }
 
 
-Uint32 slider(Uint32 interval, void * arg) {
+Uint32 sliderL(Uint32 interval, void * arg) {
 	Events *event = (Events*)arg;
 	if (event->g.lost || event->paused || event->quit) {
 		return 0;
 	}
-	if (event->getDirection() == -1) {
-		event->callQue.push(&Grid::moveL);
+	event->callQue.push(&Grid::moveL);
+	return (Uint32)event->currentInterval*0.2;
+}
+
+
+Uint32 sliderR(Uint32 interval, void * arg) {
+	Events *event = (Events*)arg;
+	if (event->g.lost || event->paused || event->quit) {
+		return 0;
 	}
-	else if (event->getDirection() == 1) {
-		event->callQue.push(&Grid::moveR);
-	}
+	event->callQue.push(&Grid::moveR);
 	return (Uint32)event->currentInterval*0.2;
 }
 
@@ -74,8 +73,9 @@ void Events::setDropSpeed() {
 void Events::init() {
 	paused = false;
 	SDL_TimerID timer = SDL_AddTimer(currentInterval, &ticker, this);
-	SDL_TimerID slideTimer = SDL_AddTimer(currentInterval*0.2, &slider, this);
-	while (!quit) {
+	SDL_TimerID slideRTimer;
+	SDL_TimerID slideLTimer;
+	while (!quit || aPressed || dPressed) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT: {
@@ -83,17 +83,27 @@ void Events::init() {
 					paused = true;
 					quit = true;
 					SDL_RemoveTimer(timer);
-					SDL_RemoveTimer(slideTimer);
+					if (aPressed) {SDL_RemoveTimer(slideLTimer);}
+					if (dPressed) {SDL_RemoveTimer(slideRTimer);}
 					break;
 				}
 				case SDL_KEYDOWN:  {
-					switch (event.key.type) {
+					cout << "Key pressed." << flush;
+					switch (event.key.keysym.sym) {
 						case SDLK_a: case SDLK_LEFT: {
-							this->direction = -1;
+							if (!aPressed) {
+								aPressed = true;
+								callQue.push(&Grid::moveL);
+								slideLTimer = SDL_AddTimer(currentInterval*0.16, &sliderL, this);
+							}
 							break;
 						}
 						case SDLK_d: case SDLK_RIGHT: {
-							this->direction = 1;
+							if (!dPressed) {
+								dPressed = true;
+								callQue.push(&Grid::moveR);
+								slideRTimer = SDL_AddTimer(currentInterval*0.16, &sliderR, this);
+							}
 							break;
 						}
 						case SDLK_SPACE: {
@@ -101,7 +111,10 @@ void Events::init() {
 							break;
 						}
 						case SDLK_s : case SDLK_DOWN : {
-							currentInterval /= 3;
+							if (!sPressed) {
+								this->callQue.push(&Grid::wholeTick);
+								currentInterval /= 2;
+							}
 							break;
 						}
 						case SDLK_w : case SDLK_UP : {
@@ -112,17 +125,26 @@ void Events::init() {
 					break;
 				}
 				case SDL_KEYUP : {
-					switch (event.key.type) {
+					switch (event.key.keysym.sym) {
 						case SDLK_a: case SDLK_LEFT: {
-							if (direction == -1){direction = 0;}
+							if (aPressed) {
+								aPressed = false;
+								SDL_RemoveTimer(slideLTimer);
+							}
 							break;
 						}
 						case SDLK_d: case SDLK_RIGHT: {
-							if (direction == 1) {direction = 0;}
+							if (dPressed) {
+								dPressed = false;
+								SDL_RemoveTimer(slideRTimer);
+							}
 							break;
 						}
 						case SDLK_s : case SDLK_DOWN : {
-							setDropSpeed();
+							if (sPressed) {
+								setDropSpeed();
+								sPressed = false;
+							}
 							break;
 						}
 					}
@@ -135,8 +157,8 @@ void Events::init() {
 			Grid::GridFunc func = callQue.front();
 			CALL_MEMBER_FN(g, func);
 			callQue.pop();
+			g.printGrid();
 		}
-		g.printGrid();
 	}
 }
 
