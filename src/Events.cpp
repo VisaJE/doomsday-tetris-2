@@ -41,7 +41,9 @@ Uint32 ticker(Uint32 interval, void * arg) {
 		return 0;
 	}
 	Grid::GridFunc func = &Grid::wholeTick;
-	event.callQue.push(func);
+	cout << event.callQue.size() << flush;
+	event.callQue.push(&Grid::wholeTick);
+	cout << event.callQue.size();
 	return event.currentInterval;
 }
 
@@ -61,9 +63,9 @@ void Events::init() {
 		}
 		if (!callQue.empty()) {
 			cout << "reacting" << endl;
-			Grid::GridFunc func = callQue.front();
-			CALL_MEMBER_FN(g, func);
-			callQue.pop();
+//			Grid::GridFunc func = callQue.front();
+//			CALL_MEMBER_FN(g, func);
+//			callQue.pop();
 		}
 	}
 }
