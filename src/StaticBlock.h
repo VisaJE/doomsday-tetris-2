@@ -17,13 +17,16 @@ namespace tet {
 
 class StaticBlock {
 public:
-	StaticBlock(vector<bool> g);
+	StaticBlock(vector<bool> g, const int boardHeight, const int boardWidth);
 	virtual ~StaticBlock();
 	void refresh(vector<bool> g);
 	bool isThere(int y, int x);
 	int trim(); // returns the number of removed lines
 	bool tryAdd(Block block, int h, int w);
+	void reset();
 private:
+	int boardHeight;
+	int boardWidth;
 	vector<bool> grid;
 };
 

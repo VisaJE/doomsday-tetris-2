@@ -14,8 +14,9 @@ class Conf {
 public:
 	Conf();
 	virtual ~Conf();
-	static const int boardWidth = 10;
-	static const int boardHeight = 19;
+	int boardWidth;
+	int boardHeight;
+	int startInterval;
 };
 
 } /* namespace tet */

@@ -12,6 +12,7 @@
 #include "Screen.h"
 #include "Events.h"
 #include "Grid.h"
+#include "Conf.h"
 
 #include "UberBlockifier.h"
 
@@ -28,24 +29,21 @@ int main()  {
 		return 1;
 	}
 
+	// Configuring
+	Conf conf = Conf();
+	const int boardHeight = conf.boardHeight;
+	const int boardWidth = conf.boardWidth;
+
 	// Initialize
 	Screen screen = Screen();
 
-	UberBlockifier blockGen(Conf::boardWidth);
+	UberBlockifier blockGen(boardWidth);
 
-	vector<bool> g(Conf::boardWidth*Conf::boardHeight, false);
-	Grid gameGrid = Grid(g, blockGen);
+	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
+	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
 
-	Events eventHandler = Events(screen, gameGrid);
-	while (eventHandler.init() == 5) {
-		cout << "New game"<< endl;
-		blockGen = UberBlockifier(Conf::boardWidth);
-
-		vector<bool> g = vector<bool>(Conf::boardWidth*Conf::boardHeight, false);
-		gameGrid = Grid(g, blockGen);
-
-		eventHandler.g=gameGrid;
-	}
+	Events eventHandler = Events(screen, gameGrid, conf.startInterval);
+	eventHandler.init();
 
 	SDL_Quit();
 	cout << "Bye." << endl;

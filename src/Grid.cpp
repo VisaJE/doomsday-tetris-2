@@ -17,7 +17,7 @@ using namespace std;
 namespace tet {
 
 // Grid class also handles the grid of the staticBlock. Deleted at the destructor!
-Grid::Grid(StaticBlock inp, UberBlockifier uber): staticBlock(inp), blockGen(uber), dropBlock(blockGen.getABlock()), height(Conf::boardHeight), width(Conf::boardWidth) {
+Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int boardWidth): staticBlock(inp), blockGen(uber), dropBlock(blockGen.getABlock()), height(boardHeight), width(boardWidth) {
 	for (int i = 0; i<height*width;i++) {
 		grid.push_back(false);
 	}
@@ -101,35 +101,40 @@ void Grid::moveR() {
 
 
 bool Grid::addBlock(Block block) {
-	staticBlock.refresh(grid);
-	points = pow(staticBlock.trim(), 1.5)*10;
-	dropBlock = block;
-	blockPos[0] = 0;
-	blockPos[1] = (width - block.width)/2;
-	if (!staticBlock.tryAdd(dropBlock, 0, blockPos[1])) {return false;}
-	refresh();
-	blocksDropped += 1;
-	return true;
+	if (!lost) {
+		staticBlock.refresh(grid);
+		points = pow(staticBlock.trim(), 1.5)*10;
+		dropBlock = block;
+		blockPos[0] = 0;
+		blockPos[1] = (width - block.width)/2;
+		if (!slide(blockPos[0], blockPos[1], width - block.width)) {return false;}
+		refresh();
+		blocksDropped += 1;
+		return true;
+	}
+	return false;
 }
 
 
 void Grid::refresh() {
-	for (int i=0;i<height*width;i++) {
-			grid[i] = false;
-	}
-	// Adding dropblock
-	for (int i=dropBlock.height-1;i>=0;i--) {
-		for (int j=dropBlock.width-1;j>=0;j--) {
-			if (dropBlock.isThere(i, j)) {
-				grid[(i + blockPos[0])*width +j+blockPos[1]] = true;
+	if (!lost) {
+		for (int i=0;i<height*width;i++) {
+				grid[i] = false;
+		}
+		// Adding dropblock
+		for (int i=dropBlock.height-1;i>=0;i--) {
+			for (int j=dropBlock.width-1;j>=0;j--) {
+				if (dropBlock.isThere(i, j)) {
+					grid[(i + blockPos[0])*width +j+blockPos[1]] = true;
+				}
 			}
 		}
-	}
-	// Adding static block
-	for (int i = 0; i<height; i++) {
-		for (int j = 0; j < width; j++) {
-			if(staticBlock.isThere(i, j)) {
-				grid[i*width + j] = true;
+		// Adding static block
+		for (int i = 0; i<height; i++) {
+			for (int j = 0; j < width; j++) {
+				if(staticBlock.isThere(i, j)) {
+					grid[i*width + j] = true;
+				}
 			}
 		}
 	}
@@ -157,7 +162,7 @@ void Grid::rotate() {
 }
 
 
-// Returns the success of placing the rotated block.
+// Returns the success of placing the block.
 bool Grid::slide(int y, int x, int l) {
 	if (y + dropBlock.height < height) {
 		for (int r=0; r<=l; r++) {
@@ -205,8 +210,20 @@ void Grid::wholeTick() {
 }
 
 
+void Grid::reset() {
+	points = 0;
+	blocksDropped = 0;
+	staticBlock.reset();
+	dropBlock = blockGen.getABlock();
+	blockPos[0] = 0;
+	blockPos[1] = (width-dropBlock.width) / 2;
+	lost = false;
+	refresh();
+}
+
+
 void Grid::printGrid() {
-	cout << "Block position: (" << blockPos[0] << ", " << blockPos[1] << ")" << endl;
+	cout << "Points: " << points << endl;
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			if (isThere(i, j)) {

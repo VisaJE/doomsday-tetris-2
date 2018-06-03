@@ -19,16 +19,17 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen screen, Grid g);
+	Events(Screen screen, Grid g, const int startInterval);
 	virtual ~Events();
 	bool paused;
 	bool quit;
 	Grid g;
 	int init();
-	Uint32 currentInterval = 1000;
+	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
 private:
+	int startInt;
 	SDL_Event event;
 	Screen screen;
 	bool sPressed = false;

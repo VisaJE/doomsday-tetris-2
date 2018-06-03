@@ -9,7 +9,7 @@
 
 namespace tet {
 
-Conf::Conf() {
+Conf::Conf(): boardWidth(10), boardHeight(19), startInterval(800) {
 
 }
 

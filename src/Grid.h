@@ -18,7 +18,7 @@ namespace tet {
 
 class Grid {
 public:
-	Grid(StaticBlock inp, UberBlockifier uber);
+	Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth);
 	virtual ~Grid();
 	bool lost = false;
 	bool isThere(int h, int w);
@@ -32,6 +32,7 @@ public:
 	bool addBlock(Block block);
 	void refresh();
 	void wholeTick();
+	void reset();
 	void printGrid();
 	typedef void (Grid::*GridFunc)(void);
 private:
