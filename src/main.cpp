@@ -28,26 +28,25 @@ int main()  {
 		return 1;
 	}
 
-	// Initialize Screen
+	// Initialize
 	Screen screen = Screen();
 
-
-	// Initialise game
-	cout << "Uber thing" << endl;
 	UberBlockifier blockGen(Conf::boardWidth);
 
-	// Game grid
 	vector<bool> g(Conf::boardWidth*Conf::boardHeight, false);
-	cout << "grid thing" << endl;
 	Grid gameGrid = Grid(g, blockGen);
 
-	// Initialise game handler
 	Events eventHandler = Events(screen, gameGrid);
+	while (eventHandler.init() == 5) {
+		cout << "New game"<< endl;
+		blockGen = UberBlockifier(Conf::boardWidth);
 
-	// Unicode translation for key events
-	int SDL_EnableUNICODE(1);
+		vector<bool> g = vector<bool>(Conf::boardWidth*Conf::boardHeight, false);
+		gameGrid = Grid(g, blockGen);
 
-	eventHandler.init();
+		eventHandler.g=gameGrid;
+	}
+
 	SDL_Quit();
 	cout << "Bye." << endl;
 	return 0;

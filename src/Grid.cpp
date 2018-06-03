@@ -63,35 +63,39 @@ bool Grid::tick() {
 
 
 void Grid::moveL() {
-	if (blockPos[1] > 0) {
-		if (staticBlock.tryAdd(dropBlock, blockPos[0], blockPos[1]-1)) {
-			for (int i=dropBlock.height-1;i>=0;i--) {
-				for (int j=0;j<dropBlock.width;j++) {
-					if (dropBlock.isThere(i, j)) {
-						grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
-						grid[ (i + blockPos[0])*width + j+blockPos[1] - 1] = true;
+	if (!lost) {
+		if (blockPos[1] > 0) {
+			if (staticBlock.tryAdd(dropBlock, blockPos[0], blockPos[1]-1)) {
+				for (int i=dropBlock.height-1;i>=0;i--) {
+					for (int j=0;j<dropBlock.width;j++) {
+						if (dropBlock.isThere(i, j)) {
+							grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
+							grid[ (i + blockPos[0])*width + j+blockPos[1] - 1] = true;
+						}
 					}
 				}
+				blockPos[1] -= 1;
 			}
 		}
-		blockPos[1] -= 1;
 	}
 }
 
 
 void Grid::moveR() {
-	if (blockPos[1] + dropBlock.width< Grid::width) {
-		if (staticBlock.tryAdd(dropBlock, blockPos[0], blockPos[1]+1)) {
-			for (int i=dropBlock.height-1;i>=0;i--) {
-				for (int j=dropBlock.width-1;j>=0;j--) {
-					if (dropBlock.isThere(i, j)) {
-						grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
-						grid [(i + blockPos[0])*width+ j+blockPos[1] + 1] = true;
+	if (!lost) {
+		if (blockPos[1] + dropBlock.width< Grid::width) {
+			if (staticBlock.tryAdd(dropBlock, blockPos[0], blockPos[1]+1)) {
+				for (int i=dropBlock.height-1;i>=0;i--) {
+					for (int j=dropBlock.width-1;j>=0;j--) {
+						if (dropBlock.isThere(i, j)) {
+							grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
+							grid [(i + blockPos[0])*width+ j+blockPos[1] + 1] = true;
+						}
 					}
 				}
+				blockPos[1] += 1;
 			}
 		}
-		blockPos[1] += 1;
 	}
 }
 
@@ -103,13 +107,6 @@ bool Grid::addBlock(Block block) {
 	blockPos[0] = 0;
 	blockPos[1] = (width - block.width)/2;
 	if (!staticBlock.tryAdd(dropBlock, 0, blockPos[1])) {return false;}
-/*	for (int i=dropBlock.height-1;i>=0;i--) {
-		for (int j=dropBlock.width-1;j>=0;j--) {
-			if (dropBlock.isThere(i,j)) {
-				grid[(i + blockPos[0])*width + j+blockPos[1]] = true;
-			}
-		}
-	}*/
 	refresh();
 	blocksDropped += 1;
 	return true;
@@ -140,20 +137,22 @@ void Grid::refresh() {
 
 
 void Grid::rotate() {
-	int oldCenter[2];
-	dropBlock.massCenter(oldCenter);
-	dropBlock.rotate();
-	int newCenter[2];
-	dropBlock.massCenter(newCenter);
-	int yPosFix = oldCenter[0] - newCenter[0];
-	int xPosFix = oldCenter[1] - newCenter[1];
-	int y = max(blockPos[0] + yPosFix, 0);
-	int x = blockPos[1] + xPosFix;
-	int sideTreshold = (int)ceil(dropBlock.width/2);
-	if (slide(y, x, sideTreshold)) {
-		refresh();
-	} else {
-		dropBlock.rotateBack();
+	if (!lost) {
+		int oldCenter[2];
+		dropBlock.massCenter(oldCenter);
+		dropBlock.rotate();
+		int newCenter[2];
+		dropBlock.massCenter(newCenter);
+		int yPosFix = oldCenter[0] - newCenter[0];
+		int xPosFix = oldCenter[1] - newCenter[1];
+		int y = max(blockPos[0] + yPosFix, 0);
+		int x = blockPos[1] + xPosFix;
+		int sideTreshold = (int)ceil(dropBlock.width/2);
+		if (slide(y, x, sideTreshold)) {
+			refresh();
+		} else {
+			dropBlock.rotateBack();
+		}
 	}
 }
 
@@ -179,21 +178,30 @@ bool Grid::slide(int y, int x, int l) {
 
 
 void Grid::wholeDrop() {
-	int p = 0;
-	while (tick()) {
-		p++;
+	if (!lost) {
+		int p = 0;
+		while (tick()) {
+			p++;
+		}
+		if (!addBlock(blockGen.getABlock())) {
+			lost = true;
+			cout << "Losted." << endl;
+		}
+		points += p*5*dropBlock.mass;
 	}
-	points += p*5*dropBlock.mass;
 }
 
 
 void Grid::wholeTick() {
-	if (!tick()) {
-		if (!addBlock(blockGen.getRandom())) {
-			lost = true;
+	if (!lost) {
+		if (!tick()) {
+			if (!addBlock(blockGen.getABlock())) {
+				lost = true;
+				cout << "Losted." << endl;
+			}
 		}
+		points += dropBlock.mass;
 	}
-	points += dropBlock.mass;
 }
 
 

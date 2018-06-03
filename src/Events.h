@@ -24,8 +24,9 @@ public:
 	bool paused;
 	bool quit;
 	Grid g;
-	void init();
+	int init();
 	Uint32 currentInterval = 1000;
+	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
 private:
 	SDL_Event event;
@@ -33,6 +34,7 @@ private:
 	bool sPressed = false;
 	bool aPressed = false;
 	bool dPressed = false;
+	bool pause();
 	void setDropSpeed();
 
 };
