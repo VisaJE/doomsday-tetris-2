@@ -17,7 +17,7 @@ using namespace std;
 namespace tet {
 
 // Grid class also handles the grid of the staticBlock. Deleted at the destructor!
-Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int boardWidth): staticBlock(inp), blockGen(uber), dropBlock(blockGen.getABlock()), height(boardHeight), width(boardWidth) {
+Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int boardWidth):  height(boardHeight), width(boardWidth), staticBlock(inp), blockGen(uber), dropBlock(blockGen.getABlock()) {
 	for (int i = 0; i<height*width;i++) {
 		grid.push_back(false);
 	}

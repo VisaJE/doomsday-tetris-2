@@ -33,16 +33,20 @@ int main()  {
 	Conf conf = Conf();
 	const int boardHeight = conf.boardHeight;
 	const int boardWidth = conf.boardWidth;
+	int screenHeight = conf.screenHeight;
+	int screenWidth = conf.screenWidth;
 
-	// Initialize
-	Screen screen = Screen();
+
 
 	UberBlockifier blockGen(boardWidth);
 
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
 	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
 
-	Events eventHandler = Events(screen, gameGrid, conf.startInterval);
+	// Initialise
+	Screen screen = Screen(screenHeight, screenWidth, gameGrid);
+
+	Events eventHandler = Events(&screen, gameGrid, conf.startInterval);
 	eventHandler.init();
 
 	SDL_Quit();

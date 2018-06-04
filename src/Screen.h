@@ -7,6 +7,9 @@
 #include <iostream>
 #include <cstring>
 #include <SDL2/SDL.h>
+#include "Grid.h"
+#include "BoxTexture.h"
+#include <vector>
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
@@ -14,18 +17,25 @@ namespace tet {
 
 class Screen {
 public:
-	static const int SCREEN_WIDTH = 400;
-	static const int SCREEN_HEIGHT = 800;
+	int SCREEN_HEIGHT;
+	int SCREEN_WIDTH;
+	Grid GRID;
 	void destroy();
 	void start();
-	Screen();
+	Screen(int h, int w, Grid g);
 	virtual ~Screen();
 private:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
 	bool isDestroyed;
-
+	void refresh();
+	void setPixel(int x, int y, int r, int g, int b);
+	int topLeft[2]; // (y, x)
+	int bottomRight[2];
+	int boxSize;
+	BoxTexture boxTexture;
+	std::vector<Uint32> buffer;
 };
 
 } /* namespace tet */

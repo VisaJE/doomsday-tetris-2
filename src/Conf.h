@@ -17,6 +17,8 @@ public:
 	int boardWidth;
 	int boardHeight;
 	int startInterval;
+	int screenHeight;
+	int screenWidth;
 };
 
 } /* namespace tet */

@@ -27,8 +27,7 @@ struct Tick {
 };
 
 
-Events::Events(Screen s, Grid g, int startInterval): paused(true),  g(g), currentInterval(startInterval), startInt(startInterval) {
-	screen = s;
+Events::Events(Screen *s, Grid g, int startInterval): paused(true),  g(g), currentInterval(startInterval), startInt(startInterval), screen(s) {
 	quit = false;
 	mutex = SDL_CreateMutex();
 }
@@ -117,7 +116,7 @@ int Events::init() {
 									callQue.push(&Grid::moveL);
 									SDL_UnlockMutex(mutex);
 								}
-								slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.08), 40), &sliderL, this);
+								slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.09), 40), &sliderL, this);
 							}
 							break;
 						}
@@ -129,7 +128,7 @@ int Events::init() {
 									callQue.push(&Grid::moveR);
 									SDL_UnlockMutex(mutex);
 								}
-								slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.08), 40), &sliderR, this);
+								slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.09), 40), &sliderR, this);
 							}
 							break;
 						}

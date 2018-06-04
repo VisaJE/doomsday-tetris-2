@@ -19,7 +19,7 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen screen, Grid g, const int startInterval);
+	Events(Screen *screen, Grid g, const int startInterval);
 	virtual ~Events();
 	bool paused;
 	bool quit;
@@ -31,7 +31,7 @@ public:
 private:
 	int startInt;
 	SDL_Event event;
-	Screen screen;
+	Screen* screen;
 	bool sPressed = false;
 	bool aPressed = false;
 	bool dPressed = false;

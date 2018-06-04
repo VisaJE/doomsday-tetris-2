@@ -21,6 +21,8 @@ public:
 	Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth);
 	virtual ~Grid();
 	bool lost = false;
+	int height;
+	int width;
 	bool isThere(int h, int w);
 	long getPoints();
 	int droppedAmount();
@@ -41,8 +43,6 @@ private:
 	StaticBlock staticBlock;
 	UberBlockifier blockGen;
 	Block dropBlock;
-	int height;
-	int width;
 	vector<bool> grid;
 	int blockPos[2]; // (y, x)
 	bool slide(int y, int x, int l);
