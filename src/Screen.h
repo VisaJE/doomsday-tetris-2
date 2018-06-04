@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cstring>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "Grid.h"
 #include "BoxTexture.h"
 #include <vector>
@@ -19,10 +20,12 @@ class Screen {
 public:
 	int SCREEN_HEIGHT;
 	int SCREEN_WIDTH;
-	Grid GRID;
+	Grid *GRID;
 	void destroy();
 	void start();
-	Screen(int h, int w, Grid g);
+	void printGrid();
+	void pause();
+	Screen(int h, int w, Grid *g);
 	virtual ~Screen();
 private:
 	SDL_Window *window;
@@ -36,6 +39,10 @@ private:
 	int boxSize;
 	BoxTexture boxTexture;
 	std::vector<Uint32> buffer;
+	TTF_Font* font;
+	SDL_Color textColor;
+	SDL_Rect infoRect;
+	bool horizontal;
 };
 
 } /* namespace tet */

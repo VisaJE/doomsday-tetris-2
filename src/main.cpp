@@ -44,9 +44,9 @@ int main()  {
 	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
 
 	// Initialise
-	Screen screen = Screen(screenHeight, screenWidth, gameGrid);
+	Screen screen = Screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler = Events(&screen, gameGrid, conf.startInterval);
+	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval);
 	eventHandler.init();
 
 	SDL_Quit();

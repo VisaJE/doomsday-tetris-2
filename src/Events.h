@@ -19,11 +19,11 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen *screen, Grid g, const int startInterval);
+	Events(Screen *screen, Grid *g, const int startInterval);
 	virtual ~Events();
 	bool paused;
 	bool quit;
-	Grid g;
+	Grid *g;
 	int init();
 	Uint32 currentInterval;
 	SDL_mutex *mutex;

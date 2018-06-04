@@ -103,7 +103,7 @@ void Grid::moveR() {
 bool Grid::addBlock(Block block) {
 	if (!lost) {
 		staticBlock.refresh(grid);
-		points = pow(staticBlock.trim(), 1.5)*10;
+		points += pow(staticBlock.trim(), 2)*20;
 		dropBlock = block;
 		blockPos[0] = 0;
 		blockPos[1] = (width - block.width)/2;
@@ -190,7 +190,6 @@ void Grid::wholeDrop() {
 		}
 		if (!addBlock(blockGen.getABlock())) {
 			lost = true;
-			cout << "Losted." << endl;
 		}
 		points += p*5*dropBlock.mass;
 	}
@@ -220,6 +219,7 @@ void Grid::reset() {
 	lost = false;
 	refresh();
 }
+
 
 
 void Grid::printGrid() {
