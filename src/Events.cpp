@@ -38,6 +38,16 @@ Events::~Events() {
 }
 
 
+bool Events::goingLeft() {
+	return aPressed;
+}
+
+
+bool Events::goingRight() {
+	return dPressed;
+}
+
+
 Uint32 ticker(Uint32 interval, void * arg) {
 	Events *event = (Events*)arg;
 	if (SDL_LockMutex(event->mutex)==0) {
@@ -59,10 +69,10 @@ Uint32 sliderL(Uint32 interval, void * arg) {
 			SDL_UnlockMutex(event->mutex);
 			return 0;
 		}
-		event->callQue.push(&Grid::moveL);
+		if (event->goingLeft()) event->callQue.push(&Grid::moveL);
 		SDL_UnlockMutex(event->mutex);
 	}
-	return interval;
+	return event->currentInterval*0.17;
 }
 
 
@@ -73,15 +83,15 @@ Uint32 sliderR(Uint32 interval, void * arg) {
 			SDL_UnlockMutex(event->mutex);
 			return 0;
 		}
-		event->callQue.push(&Grid::moveR);
+		if (event->goingRight()) event->callQue.push(&Grid::moveR);
 		SDL_UnlockMutex(event->mutex);
 	}
-	return interval;
+	return event->currentInterval*0.17;
 }
 
 
 void Events::setDropSpeed() {
-	currentInterval = startInt;
+	currentInterval = startInt - 25*(g->droppedAmount()/10);
 }
 
 
@@ -117,7 +127,7 @@ int Events::init() {
 									callQue.push(&Grid::moveL);
 									SDL_UnlockMutex(mutex);
 								}
-								slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.14), 40), &sliderL, this);
+								slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.17+40), 40), &sliderL, this);
 							}
 							break;
 						}
@@ -129,7 +139,7 @@ int Events::init() {
 									callQue.push(&Grid::moveR);
 									SDL_UnlockMutex(mutex);
 								}
-								slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.14), 40), &sliderR, this);
+								slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*0.17+40), 40), &sliderR, this);
 							}
 							break;
 						}
@@ -149,7 +159,7 @@ int Events::init() {
 									SDL_UnlockMutex(mutex);
 								}
 								SDL_RemoveTimer(timer);
-								currentInterval = (Uint32)min((int)currentInterval / 2, 100);
+								currentInterval = (Uint32)max((int)currentInterval / 4, 20);
 								timer =  SDL_AddTimer(currentInterval, &ticker, this);
 								sPressed = true;
 							}
@@ -190,13 +200,22 @@ int Events::init() {
 							if (dPressed) {
 								SDL_RemoveTimer(slideRTimer);
 								dPressed = false;}
+							SDL_LockMutex(mutex);
 							while (!callQue.empty()) {callQue.pop();}
+							SDL_UnlockMutex(mutex);
 							g->reset();
 							timer = SDL_AddTimer(startInt, &ticker, this);
 //							g.printGrid();
 							screen->printGrid();
 							break;
 							}
+						// ERROR INFO
+						case SDLK_0 : {
+							cout << "Debug info:" << endl << "Buttons pressed (a,s,d): " << aPressed << sPressed << dPressed << endl;
+							cout << "Current interval: " << currentInterval << " Stack size: " << callQue.size() << endl;
+							cout << "Game status (lost, paused, quit)" << g->lost << paused << quit << endl;
+							cout << "Points:" << g->points << " Dropped blocks: " << g->droppedAmount() << endl;
+						}
 					}
 					break;
 				}
@@ -234,24 +253,26 @@ int Events::init() {
 
 		}
 		// Update the drop speed.
-		if (this->g->droppedAmount()%10 ==9) {
-			setDropSpeed();
-			if (sPressed) {
-				currentInterval = (Uint32)min((int)currentInterval / 2, 100);
-			}
+		setDropSpeed();
+		if (sPressed) {
+			currentInterval = (Uint32)max((int)currentInterval / 4, 20);
 		}
 
 
 		// Do the next thing on call queue.
-		if (!callQue.empty() && !g->lost) {
-			if (SDL_TryLockMutex(mutex)==0) {
-				Grid::GridFunc func = callQue.front();
-				CALL_MEMBER_FN(*g, func);
-				callQue.pop();
-//				g.printGrid();
-				screen->printGrid();
-				SDL_UnlockMutex(mutex);
+		try {
+			if (!callQue.empty() && !g->lost) {
+				if (SDL_TryLockMutex(mutex)==0) {
+					Grid::GridFunc func = callQue.front();
+					CALL_MEMBER_FN(*g, func);
+					callQue.pop();
+			//				g.printGrid();
+					screen->printGrid();
+					SDL_UnlockMutex(mutex);
+				}
 			}
+		} catch (int e) {
+			cout << "Event loop failed" << endl;
 		}
 	}
 	return 0;

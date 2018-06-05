@@ -35,11 +35,13 @@ Block UberBlockifier::makeRandom() {
 	b = max(1, b);
 	vector<bool> bGrid(a*b, false);
 	bGrid[a*b/2] = true;
-	int blockAmount = min(max(1, (int)(distr(generator)*min(a, b)/1.3)), a*b-1);
+	int blockAmount = min(max(1, (int)(distr(generator)*min(a, b)/1.7)), a*b-1);
 	while(blockAmount > 0) {
 		vector<int> possibilities = allNeighbours(bGrid, a, b);
-		int index = (rand() % 100)*possibilities.size()/100;
-		bGrid[possibilities[index]] = true;
+		unsigned int index = (rand() % 100)*possibilities.size()/100;
+		if (index < 0 || index >= possibilities.size()) {
+			bGrid[possibilities[0]] = true;
+		} else bGrid[possibilities[index]] = true;
 		--blockAmount;
 	}
 	int dimensions[2] = {a, b};
@@ -122,7 +124,7 @@ vector<int> UberBlockifier::allNeighbours(vector<bool> v, int h, int w) {
 
 
 Block UberBlockifier::getABlock() {
-	int r = (rand() % 100) % 10;
+	int r = (rand() % 100) % 12;
 	if (r == 4) {return makeRandom();}
 	int a = (rand() % 100) % 7;
 	return premade[a];
@@ -136,7 +138,29 @@ Block UberBlockifier::getNormal() {
 
 
 Block UberBlockifier::getRandom() {
-	return makeRandom();
+		return makeRandom();
 }
+
+
+void UberBlockifier::test(unsigned int times) {
+	cout << "Testing random generator." << endl;
+	unsigned int i = 0;
+	while (i < times) {
+		Block b = makeRandom();
+		for (int y = 0; y < b.height; y++) {
+			for (int x = 0; x < b.width; x++) {
+				if (b.isThere(y, x)) {
+					cout << "O";
+				}
+				else {cout << " ";}
+			}
+			cout << endl;
+		}
+		cout << "---- next ----" << endl;
+		i++;
+	}
+
+}
+
 
 } /* namespace tet */

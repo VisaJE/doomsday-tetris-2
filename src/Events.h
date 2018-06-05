@@ -23,6 +23,8 @@ public:
 	virtual ~Events();
 	bool paused;
 	bool quit;
+	bool goingLeft();
+	bool goingRight();
 	Grid *g;
 	int init();
 	Uint32 currentInterval;

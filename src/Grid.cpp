@@ -101,17 +101,23 @@ void Grid::moveR() {
 
 
 bool Grid::addBlock(Block block) {
-	if (!lost) {
-		staticBlock.refresh(grid);
-		points += pow(staticBlock.trim(), 2)*20;
-		dropBlock = block;
-		blockPos[0] = 0;
-		blockPos[1] = (width - block.width)/2;
-		if (!slide(blockPos[0], blockPos[1], width - block.width)) {return false;}
-		refresh();
-		blocksDropped += 1;
-		return true;
-	}
+		if (!lost) {
+			staticBlock.refresh(grid);
+			points += pow(staticBlock.trim(), 2)*20;
+			dropBlock = block;
+			blockPos[0] = 0;
+			blockPos[1] = (width - block.width)/2;
+			try
+			{
+				if (!slide(blockPos[0], blockPos[1], width - block.width)) {return false;}
+			} catch (int e) {
+				cout << "Error at sliding on adding block." << endl;
+				return false;
+			}
+			refresh();
+			blocksDropped += 1;
+			return true;
+		}
 	return false;
 }
 
@@ -201,7 +207,6 @@ void Grid::wholeTick() {
 		if (!tick()) {
 			if (!addBlock(blockGen.getABlock())) {
 				lost = true;
-				cout << "Losted." << endl;
 			}
 		}
 		points += dropBlock.mass;

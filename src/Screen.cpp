@@ -27,17 +27,29 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 	int hLim = (bottomRight[0]-topLeft[0])/GRID->height;
 	int wLim = (bottomRight[1]-topLeft[1])/GRID->width;
 	// Setting the parameters based on the limiting dimension.
-	// Width of the info is about 150 pixels.
 	if (hLim < wLim) {
 		boxSize = hLim;
 		bottomRight[0] = topLeft[0] + GRID->height*hLim;
 		bottomRight[1] = topLeft[1] + GRID->width*hLim;
 		horizontal = true;
+		if (SCREEN_WIDTH - 135 < bottomRight[1]) {
+			wLim = (SCREEN_WIDTH-topLeft[1]-135)/GRID->width;
+			boxSize = wLim;
+			bottomRight[0] = topLeft[0] + GRID->height*wLim;
+			bottomRight[1] = topLeft[1] + GRID->width*wLim;
+		}
 	} else {
 		boxSize = wLim;
 		bottomRight[0] = topLeft[0] + GRID->height*wLim;
 		bottomRight[1] = topLeft[1] + GRID->width*wLim;
 		horizontal = false;
+		if (SCREEN_HEIGHT - 70 < bottomRight[0]) {
+			hLim = (SCREEN_HEIGHT-topLeft[0]-70)/GRID->height;
+			boxSize = hLim;
+			bottomRight[0] = topLeft[0] + GRID->height*hLim;
+			bottomRight[1] = topLeft[1] + GRID->width*hLim;
+
+		}
 	}
 	boxTexture = BoxTexture(boxSize);
 	isDestroyed = false;
@@ -60,6 +72,13 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 		throw 11;
 	}
 	buffer = vector<Uint32>(SCREEN_WIDTH*SCREEN_HEIGHT, 0);
+	// To make the background prettier.
+	for (int y =0; y < SCREEN_HEIGHT; y++) {
+		for (int x =0; x < SCREEN_WIDTH; x++) {
+			int whiteness = abs(sin(0.1*x)*sin(0.1*y))*50;
+			setPixel(y, x, whiteness, whiteness, 0.5*whiteness);
+		}
+	}
 
 
 
@@ -68,11 +87,11 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 	textColor = {200, 200, 200};
 	if (!horizontal) {
 		infoRect.x = 0;
-		infoRect.y = bottomRight[0];
+		infoRect.y = bottomRight[0] + 5;
 		infoRect.w = SCREEN_WIDTH;
 		infoRect.h = SCREEN_HEIGHT-bottomRight[0];
 	} else {
-		infoRect.x = bottomRight[1];
+		infoRect.x = bottomRight[1]+ 10;
 		infoRect.y = 0;
 		infoRect.w = SCREEN_WIDTH - bottomRight[1];
 		infoRect.h = SCREEN_HEIGHT;
@@ -107,38 +126,42 @@ void Screen::destroy() {
 
 
 void Screen::refresh() {
-	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
-	SDL_RenderClear(renderer);
+	try {
+		SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
+		SDL_RenderClear(renderer);
 
-	stringstream text;
-	if (horizontal) {
-		if (GRID->lost) {
-			text << "LOST";
+		stringstream text;
+		if (horizontal) {
+			if (GRID->lost) {
+				text << "LOST";
+			}
+			text << "\nPOINTS\n" << GRID->getPoints() << "\n\nLEVEL\n" << GRID->droppedAmount()/10 << "\n";
 		}
-		text << "\nPOINTS\n" << GRID->getPoints() << "\n\nLEVEL\n" << GRID->droppedAmount() << "\n";
-	}
-	else {
-		if (GRID->lost) {
-			text << "LOST  ";
+		else {
+			text << "POINTS: " << GRID->getPoints() << "    LEVEL: " << GRID->droppedAmount()/10 << "\n";
+			if (GRID->lost) {
+				text << "LOST  ";
+			}
 		}
-		text << "POINTS: " << GRID->getPoints() << "\nLEVEL: " << GRID->droppedAmount() << "\n";
+		string t = text.str();
+		const char* finalText = t.c_str();
+		SDL_Surface* gameInfo = TTF_RenderText_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
+		SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, gameInfo);
+		int texW = 0;
+		int texH = 0;
+		SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
+		infoRect.w = texW;
+		infoRect.h = texH;
+		SDL_RenderCopy(renderer, texture, NULL, NULL);
+		SDL_RenderCopy(renderer, message, NULL, &infoRect);
+
+
+		SDL_RenderPresent(renderer);
+		SDL_DestroyTexture(message);
+		SDL_FreeSurface(gameInfo);
+	} catch (int e) {
+		cout << "Screen refresh failed" << endl;
 	}
-	string t = text.str();
-	const char* finalText = t.c_str();
-	SDL_Surface* gameInfo = TTF_RenderText_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
-	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, gameInfo);
-	int texW = 0;
-	int texH = 0;
-	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
-	infoRect.w = texW;
-	infoRect.h = texH;
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderCopy(renderer, message, NULL, &infoRect);
-
-
-	SDL_RenderPresent(renderer);
-	SDL_DestroyTexture(message);
-	SDL_FreeSurface(gameInfo);
 
 }
 
@@ -161,8 +184,8 @@ void Screen::printGrid() {
 			if (GRID->isThere(h, w)) {
 				for (int y = 0; y < boxSize; y++) {
 					for (int x = 0; x < boxSize; x++) {
-						int r = 0.7*sin(1.57- 1.57*exp(-0.01*GRID->droppedAmount()))*boxTexture.getIntensity(y, x);
-						int g = cos(1.57-1.57*exp(-0.01*GRID->droppedAmount()))*boxTexture.getIntensity(y, x);
+						int r = min(0.01*GRID->droppedAmount()*boxTexture.getIntensity(y, x), 250.0);
+						int g = boxTexture.getIntensity(y, x);
 						int b = 50;
 						setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
 					}
@@ -185,8 +208,8 @@ void Screen::printGrid() {
 }
 
 void Screen::pause() {
-	for (int y = 0; y < SCREEN_HEIGHT; y++) {
-		for (int x = 0; x < SCREEN_WIDTH; x++) {
+	for (int y = topLeft[0]; y < bottomRight[0]; y++) {
+		for (int x = topLeft[1]; x < bottomRight[1]; x++) {
 			setPixel(y, x, 10, 10, 50);
 		}
 	}
@@ -196,10 +219,10 @@ void Screen::pause() {
 	stringstream text;
 
 	if (horizontal) {
-		text << "PAUSED\nPOINTS\n" << GRID->getPoints() << "\n\nLEVEL\n" << GRID->droppedAmount() << "\n";
+		text << "PAUSED\nPOINTS\n" << GRID->getPoints() << "\n\nLEVEL\n" << GRID->droppedAmount()/10 << "\n";
 	}
 	else {
-		text << "PAUSED\nPOINTS: " << GRID->getPoints() << "\nLEVEL: " << GRID->droppedAmount() << "\n";
+		text << "POINTS: " << GRID->getPoints() << "    LEVEL: " << GRID->droppedAmount()/10 << "\nPAUSED";
 	}
 	string t = text.str();
 	const char* finalText = t.c_str();

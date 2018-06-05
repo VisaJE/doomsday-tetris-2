@@ -23,6 +23,7 @@ public:
 	Block getABlock();
 	Block getNormal();
 	Block getRandom();
+	void test(unsigned int times);
 private:
 	std::mt19937 generator;
 	int maxSize;
