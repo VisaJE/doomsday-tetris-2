@@ -95,6 +95,35 @@ void Events::setDropSpeed() {
 }
 
 
+int Events::menu() {
+	screen->menu();
+	int err = 0;
+	while (!quit) {
+		while(SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT: {
+				quit = true;
+				break;
+			}
+			case SDL_KEYDOWN : {
+				switch (event.key.keysym.sym)
+				case SDLK_RETURN : {
+					err = init();
+					screen->menu();
+					break;
+				}
+			/*	case SDLK_ESCAPE : {
+					quit = true;
+					break;
+				}*/
+			}
+			}
+		}
+	}
+	return err;
+}
+
+
 int Events::init() {
 	setDropSpeed();
 	paused = false;
@@ -212,6 +241,25 @@ int Events::init() {
 							} catch (int i) {}
 							break;
 							}
+						// If game over go to menu.
+						case SDLK_RETURN : {
+							if (g->lost) {
+								SDL_UnlockMutex(mutex);
+								SDL_RemoveTimer(timer);
+								if (aPressed) {SDL_RemoveTimer(slideLTimer);}
+								if (dPressed) {SDL_RemoveTimer(slideRTimer);}
+								return 0;
+							}
+							else break;
+						}
+						// MENU
+						case SDLK_ESCAPE : {
+							SDL_UnlockMutex(mutex);
+							SDL_RemoveTimer(timer);
+							if (aPressed) {SDL_RemoveTimer(slideLTimer);}
+							if (dPressed) {SDL_RemoveTimer(slideRTimer);}
+							return 0;
+						}
 						// ERROR INFO
 						case SDLK_0 : {
 							cout << "Debug info:" << endl << "Buttons pressed (a,s,d): " << aPressed << sPressed << dPressed << endl;

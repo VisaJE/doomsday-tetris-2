@@ -54,7 +54,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 	boxTexture = BoxTexture(boxSize);
 	isDestroyed = false;
 
-	window = SDL_CreateWindow("Tetris",
+	window = SDL_CreateWindow("DoomsdayTetris-2",
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
 	if (window==NULL)  {
@@ -83,7 +83,12 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 
 	font = TTF_OpenFont("arial.ttf", 30);
-	if (font == NULL) throw 20;
+	textFont = TTF_OpenFont("arial.ttf", 12);
+
+	if (font == NULL && textFont == NULL) {
+		cout << "Font not found" << endl;
+		throw 20;
+	}
 	textColor = {200, 200, 200};
 	if (!horizontal) {
 		infoRect.x = 0;
@@ -121,7 +126,69 @@ void Screen::destroy() {
 		}
 	}
 	TTF_CloseFont(font);
+	TTF_CloseFont(textFont);
 	isDestroyed = true;
+}
+
+bool doomText[] = 	{	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0, 1, 1, 0, 0, 0, 1, 1, 1, 0,
+						0, 1, 0, 1, 0, 0, 0, 1, 0, 0,
+						0, 1, 0, 1, 0, 0, 0, 1, 0, 0,
+						0, 1, 1, 0, 0, 0, 0, 1, 0, 0};
+
+
+void Screen::printHelp(SDL_Rect rect) {
+	const char* text = "Keybindings:\n\nP - pause\nS - fast drop\nW - rotate\nA,D   - slide\nSPACE - immediate drop\nESC   - menu\n\nPress enter.";
+	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(textFont, text, textColor, rect.w);
+	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
+	int texW, texH = 0;
+	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
+	rect.w = min(texW, rect.w);
+	rect.h = min(texH, rect.h);
+	SDL_RenderCopy(renderer, message, NULL, &rect);
+	SDL_RenderPresent(renderer);
+	SDL_DestroyTexture(message);
+	SDL_FreeSurface(textSurf);
+
+
+}
+
+
+void Screen::menu() {
+	SDL_Rect textArea;
+	textArea.x = topLeft[1] + 45;
+	textArea.y = bottomRight[0] - 175;
+	textArea.w = bottomRight[1] - topLeft[1];
+	textArea.h = bottomRight[0] - textArea.y;
+	for (int y = topLeft[0]; y < bottomRight[0]; y++) {
+		for (int x = topLeft[1]; x < bottomRight[1]; x++) {
+			int r = 10;
+			int g =  10;
+			int b = 50;
+			setPixel(y, x, r ,g ,b);
+		}
+	}
+	if (GRID->height > 5 && GRID->width > 9) {
+		for (int h = 0; h < 5; h++) {
+			for (int w = 0; w < 10; w++) {
+				if (doomText[h*10+w]) {
+					for (int y = 0; y < boxSize; y++) {
+						for (int x = 0; x < boxSize; x++) {
+							int r = 230*boxTexture.getIntensity(y, x);
+							int g = 150*boxTexture.getIntensity(y, x);
+							int b = 50;
+							setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
+						}
+					}
+				}
+			}
+		}
+	}
+	SDL_RenderClear(renderer);
+	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_RenderPresent(renderer);
+	printHelp(textArea);
 }
 
 

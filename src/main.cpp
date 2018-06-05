@@ -38,7 +38,6 @@ int main()  {
 
 
 	UberBlockifier blockGen(boardWidth);
-	blockGen.test(500);
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
 	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
 
@@ -46,7 +45,7 @@ int main()  {
 	Screen screen = Screen(screenHeight, screenWidth, &gameGrid);
 
 	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval, conf.slideSpeed);
-	eventHandler.init();
+	eventHandler.menu();
 
 	SDL_Quit();
 	cout << "Bye." << endl;

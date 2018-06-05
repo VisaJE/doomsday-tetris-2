@@ -28,6 +28,8 @@ public:
 	bool goingRight();
 	Grid *g;
 	int init();
+	int menu();
+	int setHighscore();
 	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;

@@ -25,6 +25,8 @@ public:
 	void start();
 	void printGrid();
 	void pause();
+	void menu();
+	void printHelp(SDL_Rect rect);
 	Screen(int h, int w, Grid *g);
 	virtual ~Screen();
 private:
@@ -40,6 +42,7 @@ private:
 	BoxTexture boxTexture;
 	std::vector<Uint32> buffer;
 	TTF_Font* font;
+	TTF_Font* textFont;
 	SDL_Color textColor;
 	SDL_Rect infoRect;
 	bool horizontal;

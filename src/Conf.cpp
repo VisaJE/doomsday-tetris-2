@@ -53,6 +53,7 @@ bool Conf::competitionValid() {
 	bool valid = true;
 	if (startInterval > 500) valid = false;
 	if (slideSpeed > 8) valid = false;
+	if (!(boardWidth == 10 && boardHeight == 19)) valid = false;
 	return valid;
 }
 

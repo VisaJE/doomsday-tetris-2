@@ -124,10 +124,24 @@ vector<int> UberBlockifier::allNeighbours(vector<bool> v, int h, int w) {
 	return res;
 }
 
-
+// Contains some fixes for random bugs.
 Block UberBlockifier::getABlock() {
 	int r = (rand() % 100) % 12;
-	if (r == 4) {return makeRandom();}
+	if (r == 4) {
+		try {
+			Block b = makeRandom();
+			if (b.width != 2 || b.height != 2) {
+				return b;
+			}
+			else if ( (b.isThere(0,0) && !b.isThere(0,1)) || (b.isThere(0,1)  && !b.isThere(0,0))) {
+				return makeRandom();
+			}
+			return b;
+		}
+		catch (int e) {
+			return makeRandom();
+		}
+	}
 	int a = (rand() % 100) % 7;
 	return premade[a];
 }
@@ -149,7 +163,7 @@ void UberBlockifier::test(unsigned int times) {
 	unsigned int i = 0;
 	while (i < times) {
 		try {
-			Block b = makeRandom();
+			Block b = getABlock();
 
 			cout << "Size: " << b.height << ", " << b.width << endl;
 			for (int y = 0; y < b.height; y++) {
