@@ -37,16 +37,15 @@ int main()  {
 	int screenWidth = conf.screenWidth;
 
 
-
 	UberBlockifier blockGen(boardWidth);
-
+	blockGen.test(500);
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
 	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
 
 	// Initialise
 	Screen screen = Screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval);
+	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval, conf.slideSpeed);
 	eventHandler.init();
 
 	SDL_Quit();

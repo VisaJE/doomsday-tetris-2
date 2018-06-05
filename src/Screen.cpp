@@ -20,8 +20,8 @@ namespace tet {
 Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g) {
 	TTF_Init();
 	// Available space for the grid.
-	topLeft[0] = 0;
-	topLeft[1] = 0;
+	topLeft[0] = 15;
+	topLeft[1] = 15;
 	bottomRight[0] = h-1;
 	bottomRight[1] = w-1;
 	int hLim = (bottomRight[0]-topLeft[0])/GRID->height;

@@ -52,7 +52,7 @@ Block UberBlockifier::makeRandom() {
 	}
 	int cent[2] = {0, 0};
 	res.massCenter(cent);
-	if (cent[0] > res.height/2) {
+	if (cent[0] >= res.height/2) {
 		res.rotate();
 		res.rotate();
 	}
@@ -61,26 +61,28 @@ Block UberBlockifier::makeRandom() {
 
 
 vector<bool> UberBlockifier::trimGrid(vector<bool> in, int size[2]) {
-	for (int i = size[0]-1; i>=0;i--) {
-		bool empty = true;
-		for (int j = 0; j<size[1];j++) {
-			if (in[i*size[1] + j]) {empty = false;}
-		}
-		if (empty) {
-			in.erase(in.begin() + i*size[0], in.begin() + i*size[0] + size[1]);
-			size[0] -= 1;
-		}
-	}
-	for (int i = size[1]-1; i>=0;i--) {
-		bool empty = true;
-		for (int j=0; j<size[0]; j++) {
-			if (in[j*size[1] + i]) {empty = false;}
-		}
-		if (empty) {
-			for (int j=size[0]-1; j>=0; j--) {
-				in.erase(in.begin() + j*size[1] + i);
+	for (int a = 1; a < 3; a++ ) {
+		for (int i = size[0]-1; i>=0;i--) {
+			bool empty = true;
+			for (int j = 0; j<size[1];j++) {
+				if (in[i*size[1] + j]) {empty = false;}
 			}
-		size[1] -= 1;
+			if (empty) {
+				in.erase(in.begin() + i*size[0], in.begin() + i*size[0] + size[1]);
+				size[0] -= 1;
+			}
+		}
+		for (int i = size[1]-1; i>=0;i--) {
+			bool empty = true;
+			for (int j=0; j<size[0]; j++) {
+				if (in[j*size[1] + i]) {empty = false;}
+			}
+			if (empty) {
+				for (int j=size[0]-1; j>=0; j--) {
+					in.erase(in.begin() + j*size[1] + i);
+				}
+				size[1] -= 1;
+			}
 		}
 	}
 	return in;
@@ -138,7 +140,7 @@ Block UberBlockifier::getNormal() {
 
 
 Block UberBlockifier::getRandom() {
-		return makeRandom();
+	return makeRandom();
 }
 
 
@@ -146,17 +148,23 @@ void UberBlockifier::test(unsigned int times) {
 	cout << "Testing random generator." << endl;
 	unsigned int i = 0;
 	while (i < times) {
-		Block b = makeRandom();
-		for (int y = 0; y < b.height; y++) {
-			for (int x = 0; x < b.width; x++) {
-				if (b.isThere(y, x)) {
-					cout << "O";
+		try {
+			Block b = makeRandom();
+
+			cout << "Size: " << b.height << ", " << b.width << endl;
+			for (int y = 0; y < b.height; y++) {
+				for (int x = 0; x < b.width; x++) {
+					if (b.isThere(y, x)) {
+						cout << "O";
+					}
+					else {cout << " ";}
 				}
-				else {cout << " ";}
+				cout << endl;
 			}
-			cout << endl;
-		}
-		cout << "---- next ----" << endl;
+			cout << "---- next ----" << endl;
+		} catch (int e) {
+					cout << "making random failed" << endl;
+				}
 		i++;
 	}
 
