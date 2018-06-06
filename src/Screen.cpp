@@ -14,6 +14,7 @@
 #include "BoxTexture.h"
 #include <vector>
 #include <sstream>
+#include <iomanip>
 
 namespace tet {
 
@@ -199,12 +200,42 @@ void Screen::menu(string names[10], int scores[10]) {
 }
 
 
+void Screen::gameOver(string text) {
+	SDL_Rect r;
+	r.x = topLeft[1] + 10;
+	r.w = bottomRight[1] - 10-r.x;
+	r.y = topLeft[0] + 3*boxSize;
+	r.h = bottomRight[0] - r.y;
+
+	const char* t = text.c_str();
+	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(scoreFont, t, textColor, r.w);
+	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
+	int texW, texH = 0;
+	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
+	r.w = min(texW, r.w);
+	r.h = min(texH, r.h);
+	for (int i = r.x; i < r.w+r.x; i++) {
+		for (int j = r.y; j < r.h + r.y; j++) {
+			setPixel(j, i, 0, 0, 0);
+		}
+	}
+	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_RenderCopy(renderer, message, NULL, &r);
+	SDL_RenderPresent(renderer);
+	SDL_DestroyTexture(message);
+	SDL_FreeSurface(textSurf);
+
+}
+
+
 void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10]) {
 	stringstream t;
 	t << "LEADERBOARD\n\n";
-	for (int i = 0; i < 10; i++) {
-		t << i+1 << ". " << names[i] << "   -   " << scores[i] << "\n";
+	for (int i = 0; i < 9; i++) {
+		t << i+1 << ". " << names[i] << string(10-names[i].size(), ' ') << "   -   " << scores[i] << "\n";
 	}
+	t << 10 << ". " << names[9] << string(10-names[9].size(), ' ') << " -   " << scores[9] << "\n";
 	string  s = t.str();
 	const char* text = s.c_str();
 	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(scoreFont, text, {160, 200, 50}, hsArea.w);

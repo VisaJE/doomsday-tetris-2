@@ -22,6 +22,8 @@ public:
 	virtual ~Highscorer();
 	void getHighscore(std::string name[10], int score[10]);
 	bool addScore(std::string name, int score);
+	int getHighest();
+	int getLowest();
 private:
 	FILE* file;
 	void setFile(std::string t);
@@ -33,7 +35,7 @@ private:
 	void sort(std::string name[10], int score[10]);
 	std::string currentBoard[10];
 	int currentScore[10];
-	const std::string key = "6457674567456734563456345624554634563452345245656745634562345";
+	const std::string key = "1";
 	const std::string prototype = "{\"name\" : [\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"], \"score\": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}";
 };
 

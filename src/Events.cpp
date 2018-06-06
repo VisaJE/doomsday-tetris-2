@@ -27,7 +27,8 @@ struct Tick {
 };
 
 
-Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed): paused(true), slideSpeed(slideSpeed), g(g), currentInterval(startInterval), startInt(startInterval), screen(s) {
+Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool scoreable): paused(true), slideSpeed(slideSpeed),
+		g(g), currentInterval(startInterval), fairToScore(scoreable), startInt(startInterval), screen(s) {
 	quit = false;
 	mutex = SDL_CreateMutex();
 }
@@ -95,6 +96,96 @@ void Events::setDropSpeed() {
 }
 
 
+int Events::setHighscore() {
+	bool done = false;
+	if (!fairToScore) {
+		screen->gameOver("Your configuration is not fair for scoring.");
+		while (!quit && !done) {
+				while(SDL_PollEvent(&event)) {
+					switch (event.type) {
+					case SDL_QUIT: {
+						quit = true;
+						break;
+					}
+					case SDL_KEYDOWN: {
+						done = true;
+					}
+					}
+				}
+		}
+		return 0;
+	}
+	if (g->getPoints()<hs.getLowest()) {
+
+		screen->gameOver("Your score was not enough\nto reach the leaderboard.");
+		while (!quit && !done) {
+				while(SDL_PollEvent(&event)) {
+					switch (event.type) {
+					case SDL_QUIT: {
+						quit = true;
+						break;
+					}
+					case SDL_KEYDOWN: {
+						done = true;
+					}
+					}
+				}
+		}
+		return 0;
+	}
+	string t;
+	short len = 0;
+	string text ="Enter your name to be\nremembered among the best:\n";
+	screen->gameOver(text);
+	SDL_StartTextInput();
+	while (!quit && !done) {
+			while(SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_QUIT: {
+					quit = true;
+					break;
+				}
+                case SDL_TEXTINPUT:
+                    /* Add new text onto the end of our text */
+                	if (len < 10) {
+                		t.append(event.text.text);
+                		++len;
+                		string temp = text;
+                		screen->gameOver(temp.append(t));
+                	} // @suppress("No break at end of case")
+                case SDL_KEYDOWN:
+                	switch (event.key.keysym.sym) {
+                	case SDLK_BACKSPACE:
+                		if (len > 0) {
+                			--len;
+                			t.pop_back();
+                			string temp = text;
+                			screen->gameOver(temp.append(t));
+                		}
+                		break;
+                	case SDLK_RETURN :
+                		if (len > 0) {
+                			while (t.length()> 10) {
+                				t.pop_back();
+                			}
+                			hs.addScore(t, g->getPoints());
+                			done = true;
+                		}
+                		else {
+                			text = "Enter even something to be\nremembered among the best:\n";
+                			screen->gameOver(text);
+                		}
+                		break;
+
+                	}
+				}
+			}
+	}
+	SDL_StopTextInput();
+	return 0;
+}
+
+
 int Events::menu() {
 	string names[10];
 	int scores[10];
@@ -112,6 +203,13 @@ int Events::menu() {
 				switch (event.key.keysym.sym)
 				case SDLK_RETURN : {
 					err = init();
+					if (g->lost && err == 0) {
+						err = setHighscore();
+						g->reset();
+						while (callQue.size()!=0){
+							callQue.pop();
+						}
+					}
 					hs.getHighscore(names, scores);
 					screen->menu(names, scores);
 					break;

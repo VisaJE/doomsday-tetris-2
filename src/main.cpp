@@ -45,11 +45,10 @@ int main()  {
 	// Initialise
 	Screen screen = Screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval, conf.slideSpeed);
+	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid());
 	eventHandler.menu();
 
 	SDL_Quit();
-	cout << "Bye." << endl;
 	return 0;
 }
 

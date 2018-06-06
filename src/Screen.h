@@ -26,6 +26,7 @@ public:
 	void printGrid();
 	void pause();
 	void menu(string names[10], int scores[10]);
+	void gameOver(string text);
 
 	Screen(int h, int w, Grid *g);
 	virtual ~Screen();

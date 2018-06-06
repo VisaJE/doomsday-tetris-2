@@ -16,26 +16,33 @@
 #include <cstdio>
 #include <fstream>
 #include <vector>
+#include <climits>
 using namespace std;
 using namespace rapidjson;
 namespace tet {
 
 Highscorer::Highscorer() {
+	for (int i = 0; i < 10; i++) {
+		currentScore[i] = 0;
+	}
 	Document scoreBoard;
 	if (!fileExists(".hs.json")) setFile(prototype);
 	else {
-		file = fopen(".hs.json", "rb");
 		try {
 			string t = readFile();
 			scoreBoard.Parse(t.c_str());
+			if (scoreBoard.HasParseError()) {
+				cout << "Parsing error. Leaderboard reset." << endl;
+				setFile(prototype);
+				readFile();
+
+			}
 			if (validate(&scoreBoard)) {
 				updateLists(&scoreBoard);
 			} else {
 				setFile(prototype);
-				updateLists(&scoreBoard);
 			}
-			fclose(file);
-		} catch (int i) { setFile(prototype);}
+		} catch (int i) { cout << "Failure in setting the leaderboard." << endl;}
 	}
 
 }
@@ -53,12 +60,22 @@ void Highscorer::getHighscore(string name[10], int score[10]) {
 
 }
 
+int Highscorer::getHighest() {
+	int highest = 0;
+	for (int i = 0; i < 10; i++) if (currentScore[i] > highest) highest = currentScore[i];
+	return highest;
+}
+
+int Highscorer::getLowest() {
+	int lowest = INT_MAX;
+	for (int i = 0; i < 10; i++) if (currentScore[i] < lowest) lowest = currentScore[i];
+	return lowest;
+}
 void Highscorer::sort(string name[10], int score[10]) {
 	int i = 0;
 	while (i < 8) {
 		while (score[i+1] <= score[i] && i < 9) {
 			++i;
-			cout << i << endl;
 		}
 		if (i < 9 && score[i+1] > score[i]) {
 			string tempn = name[i];
@@ -107,12 +124,10 @@ void Highscorer::refreshFile() {
 	Document scoreBoard;
 	if (!fileExists(".hs.json")) setFile(prototype);
 	else {
-		file = fopen(".hs.json", "rb");
 		scoreBoard.Parse(readFile().c_str());
 		if (!validate(&scoreBoard)) setFile(prototype);
 	}
 	scoreBoard.Parse(readFile().c_str());
-	fclose(file);
 
 	Value::MemberIterator names = scoreBoard.FindMember("name");
 	Value::MemberIterator scores = scoreBoard.FindMember("score");
@@ -184,6 +199,7 @@ std::string decrypt(std::string const& msg, std::string const& key)
 
 
 void Highscorer::setFile(string t) {
+	remove (".hs.json");
 	ofstream out(".hs.json");
 	string enc = encrypt(t, key);
 	out << enc;
@@ -200,9 +216,10 @@ string Highscorer::readFile() {
 		s << c;
 	}
 	string out = decrypt(s.str(), key);
-	while(out.back() != '}'){
+	while(out.back() != '}' && out.size() > 0){
 		out.pop_back();
 	}
+	fclose(file);
 	return out;
 }
 

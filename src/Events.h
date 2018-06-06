@@ -20,7 +20,7 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed);
+	Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable);
 	virtual ~Events();
 	bool paused;
 	bool quit;
@@ -30,13 +30,15 @@ public:
 	Grid *g;
 	int init();
 	int menu();
-	int setHighscore();
+
 	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
 
 private:
 	Highscorer hs = Highscorer();
+	bool fairToScore;
+	int setHighscore();
 	int startInt;
 	SDL_Event event;
 	Screen* screen;
