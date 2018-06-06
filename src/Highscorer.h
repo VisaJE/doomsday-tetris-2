@@ -34,7 +34,7 @@ private:
 	std::string currentBoard[10];
 	int currentScore[10];
 	const std::string key = "6457674567456734563456345624554634563452345245656745634562345";
-	const std::string prototype = "{\"name\" : ["", "", "", "", "", "", "", "", "", ""], \"score\": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}";
+	const std::string prototype = "{\"name\" : [\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"], \"score\": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}";
 };
 
 } /* namespace tet */

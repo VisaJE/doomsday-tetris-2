@@ -10,6 +10,7 @@
 #include "Screen.h"
 #include "Grid.h"
 #include "UberBlockifier.h"
+#include "Highscorer.h"
 #include "queue"
 
 #ifndef EVENTS_H_
@@ -35,6 +36,7 @@ public:
 	std::queue<Grid::GridFunc> callQue;
 
 private:
+	Highscorer hs = Highscorer();
 	int startInt;
 	SDL_Event event;
 	Screen* screen;

@@ -83,7 +83,8 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 
 	font = TTF_OpenFont("arial.ttf", 30);
-	textFont = TTF_OpenFont("arial.ttf", 12);
+	textFont = TTF_OpenFont("arial.ttf", 11);
+	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.6);
 
 	if (font == NULL && textFont == NULL) {
 		cout << "Font not found" << endl;
@@ -127,6 +128,7 @@ void Screen::destroy() {
 	}
 	TTF_CloseFont(font);
 	TTF_CloseFont(textFont);
+	TTF_CloseFont(scoreFont);
 	isDestroyed = true;
 }
 
@@ -138,7 +140,7 @@ bool doomText[] = 	{	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 void Screen::printHelp(SDL_Rect rect) {
-	const char* text = "Keybindings:\n\nP - pause\nS - fast drop\nW - rotate\nA,D   - slide\nSPACE - immediate drop\nESC   - menu\n\nPress enter.";
+	const char* text = "Key bindings:\n\nP - pause\nS - fast drop\nW - rotate\nA,D   - slide\nSPACE - immediate drop\nESC   - menu\n\nPress enter.";
 	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(textFont, text, textColor, rect.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;
@@ -149,15 +151,13 @@ void Screen::printHelp(SDL_Rect rect) {
 	SDL_RenderPresent(renderer);
 	SDL_DestroyTexture(message);
 	SDL_FreeSurface(textSurf);
-
-
 }
 
 
-void Screen::menu() {
+void Screen::menu(string names[10], int scores[10]) {
 	SDL_Rect textArea;
 	textArea.x = topLeft[1] + 45;
-	textArea.y = bottomRight[0] - 175;
+	textArea.y = bottomRight[0] - boxSize*3.6;
 	textArea.w = bottomRight[1] - topLeft[1];
 	textArea.h = bottomRight[0] - textArea.y;
 	for (int y = topLeft[0]; y < bottomRight[0]; y++) {
@@ -189,6 +189,34 @@ void Screen::menu() {
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
 	printHelp(textArea);
+
+	SDL_Rect hsArea;
+	hsArea.x = topLeft[1] + 45;
+	hsArea.y = topLeft[0] + boxSize*5 +  45;
+	hsArea.w = bottomRight[1]-45 - hsArea.x;
+	hsArea.h = textArea.y - hsArea.y;
+	printHS(hsArea, names, scores);
+}
+
+
+void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10]) {
+	stringstream t;
+	t << "LEADERBOARD\n\n";
+	for (int i = 0; i < 10; i++) {
+		t << i+1 << ". " << names[i] << "   -   " << scores[i] << "\n";
+	}
+	string  s = t.str();
+	const char* text = s.c_str();
+	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(scoreFont, text, {160, 200, 50}, hsArea.w);
+	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
+	int texW, texH = 0;
+	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
+	hsArea.w = min(texW, hsArea.w);
+	hsArea.h = min(texH, hsArea.h);
+	SDL_RenderCopy(renderer, message, NULL, &hsArea);
+	SDL_RenderPresent(renderer);
+	SDL_DestroyTexture(message);
+	SDL_FreeSurface(textSurf);
 }
 
 

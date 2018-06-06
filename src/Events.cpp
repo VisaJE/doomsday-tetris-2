@@ -96,7 +96,10 @@ void Events::setDropSpeed() {
 
 
 int Events::menu() {
-	screen->menu();
+	string names[10];
+	int scores[10];
+	hs.getHighscore(names, scores);
+	screen->menu(names, scores);
 	int err = 0;
 	while (!quit) {
 		while(SDL_PollEvent(&event)) {
@@ -109,7 +112,8 @@ int Events::menu() {
 				switch (event.key.keysym.sym)
 				case SDLK_RETURN : {
 					err = init();
-					screen->menu();
+					hs.getHighscore(names, scores);
+					screen->menu(names, scores);
 					break;
 				}
 			/*	case SDLK_ESCAPE : {

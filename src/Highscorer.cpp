@@ -25,17 +25,18 @@ Highscorer::Highscorer() {
 	if (!fileExists(".hs.json")) setFile(prototype);
 	else {
 		file = fopen(".hs.json", "rb");
-		scoreBoard.Parse(readFile().c_str());
-		if (validate(&scoreBoard)) {
-			updateLists(&scoreBoard);
-		} else {
-			setFile(prototype);
-			updateLists(&scoreBoard);
-		}
-		scoreBoard.Parse(readFile().c_str());
-		fclose(file);
+		try {
+			string t = readFile();
+			scoreBoard.Parse(t.c_str());
+			if (validate(&scoreBoard)) {
+				updateLists(&scoreBoard);
+			} else {
+				setFile(prototype);
+				updateLists(&scoreBoard);
+			}
+			fclose(file);
+		} catch (int i) { setFile(prototype);}
 	}
-
 
 }
 
@@ -44,7 +45,6 @@ Highscorer::~Highscorer() {
 
 
 void Highscorer::getHighscore(string name[10], int score[10]) {
-
 	for (int i = 0; i < 10; i++) {
 			name[i] = currentBoard[i];
 			score[i] = currentScore[i];
@@ -55,18 +55,19 @@ void Highscorer::getHighscore(string name[10], int score[10]) {
 
 void Highscorer::sort(string name[10], int score[10]) {
 	int i = 0;
-	while (i < 9) {
-		i = 0;
+	while (i < 8) {
 		while (score[i+1] <= score[i] && i < 9) {
 			++i;
+			cout << i << endl;
 		}
-		if (score[i+1] > score[i]) {
-			string tempn = (name)[i];
-			int temps = (score)[i];
-			(name)[i] = (name)[i+1];
-			(score)[i] = (score)[i+1];
-			(name)[i+1] = tempn;
-			(score)[i+1] = temps;
+		if (i < 9 && score[i+1] > score[i]) {
+			string tempn = name[i];
+			int temps = score[i];
+			name[i] = name[i+1];
+			score[i] = score[i+1];
+			name[i+1] = tempn;
+			score[i+1] = temps;
+			i = 0;
 		}
 	}
 }
@@ -199,7 +200,9 @@ string Highscorer::readFile() {
 		s << c;
 	}
 	string out = decrypt(s.str(), key);
-	out.pop_back();
+	while(out.back() != '}'){
+		out.pop_back();
+	}
 	return out;
 }
 

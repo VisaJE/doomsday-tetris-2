@@ -37,7 +37,7 @@ int main()  {
 	int screenHeight = conf.screenHeight;
 	int screenWidth = conf.screenWidth;
 
-	Highscorer hs = Highscorer();
+
 	UberBlockifier blockGen(boardWidth);
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
 	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);

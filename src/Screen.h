@@ -25,8 +25,8 @@ public:
 	void start();
 	void printGrid();
 	void pause();
-	void menu();
-	void printHelp(SDL_Rect rect);
+	void menu(string names[10], int scores[10]);
+
 	Screen(int h, int w, Grid *g);
 	virtual ~Screen();
 private:
@@ -35,6 +35,8 @@ private:
 	SDL_Texture *texture;
 	bool isDestroyed;
 	void refresh();
+	void printHelp(SDL_Rect rect);
+	void printHS(SDL_Rect hsArea,string names[10], int scores[10]);
 	void setPixel(int x, int y, int r, int g, int b);
 	int topLeft[2]; // (y, x)
 	int bottomRight[2];
@@ -43,6 +45,7 @@ private:
 	std::vector<Uint32> buffer;
 	TTF_Font* font;
 	TTF_Font* textFont;
+	TTF_Font* scoreFont;
 	SDL_Color textColor;
 	SDL_Rect infoRect;
 	bool horizontal;
