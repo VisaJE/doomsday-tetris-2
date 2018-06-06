@@ -189,7 +189,7 @@ int Events::init() {
 									SDL_UnlockMutex(mutex);
 								}
 								SDL_RemoveTimer(timer);
-								currentInterval = (Uint32)max((int)currentInterval / 4, 20);
+								currentInterval = (Uint32)max((int)currentInterval / 6, 20);
 								timer =  SDL_AddTimer(currentInterval, &ticker, this);
 								sPressed = true;
 							}
@@ -306,7 +306,7 @@ int Events::init() {
 		// Update the drop speed.
 		setDropSpeed();
 		if (sPressed) {
-			currentInterval = (Uint32)max((int)currentInterval / 4, 20);
+			currentInterval = (Uint32)max((int)currentInterval / 6, 20);
 		}
 
 
