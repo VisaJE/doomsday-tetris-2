@@ -84,7 +84,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 
 	font = TTF_OpenFont("arial.ttf", 30);
-	textFont = TTF_OpenFont("arial.ttf", boxSize/4.0);
+	textFont = TTF_OpenFont("arial.ttf", boxSize/3.0);
 	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.6);
 
 	if (font == NULL && textFont == NULL) {
@@ -141,7 +141,7 @@ bool doomText[] = 	{	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 void Screen::printHelp(SDL_Rect rect) {
-	const char* text = "Key bindings:\n\nP - pause\nS - fast drop\nW - rotate\nA,D   - slide\nSPACE - immediate drop\nESC   - menu\n\nPress enter.";
+	const char* text = "Key bindings:\n\nP - pause           R - restart\nS - fast drop       W - rotate\nA,D   - slide        SPACE - immediate drop\nESC   - menu\n\nPress enter.";
 	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(textFont, text, textColor, rect.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;

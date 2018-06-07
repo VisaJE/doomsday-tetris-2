@@ -37,7 +37,7 @@ Highscorer::Highscorer() {
 				readFile();
 
 			}
-			if (validate(&scoreBoard)) {
+			else if (validate(&scoreBoard)) {
 				updateLists(&scoreBoard);
 			} else {
 				setFile(prototype);

@@ -18,7 +18,7 @@ using namespace rapidjson;
 namespace tet {
 // Default values are set at the constructor.
 Conf::Conf() {
-	const char norm[] = " { \"BOARD_WIDTH\": 10 , \"BOARD_HEIGHT\": 19, \"START_INTERVAL\": 500, \"SCREEN_WIDTH\": 600, \"SCREEN_HEIGHT\": 900, \"SLIDE_SPEED\": 6 } ";
+	const char norm[] = " { \"BOARD_WIDTH\": 10 , \"BOARD_HEIGHT\": 19, \"START_INTERVAL\": 500, \"SCREEN_WIDTH\": 600, \"SCREEN_HEIGHT\": 900, \"SLIDE_SPEED\": 5 } ";
 	Document defa;
 	defa.Parse(norm);
 	// Ditch the b in the acces specifier for non windows systems.
