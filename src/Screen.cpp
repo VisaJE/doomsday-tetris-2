@@ -84,7 +84,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 
 	font = TTF_OpenFont("arial.ttf", 30);
-	textFont = TTF_OpenFont("arial.ttf", boxSize/10);
+	textFont = TTF_OpenFont("arial.ttf", boxSize/4.0);
 	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.6);
 
 	if (font == NULL && textFont == NULL) {
@@ -148,7 +148,7 @@ void Screen::printHelp(SDL_Rect rect) {
 	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
 	rect.w = min(texW, rect.w);
 	rect.h = min(texH, rect.h);
-	SDL_RenderClear(renderer);
+
 	SDL_RenderCopy(renderer, message, NULL, &rect);
 	SDL_RenderPresent(renderer);
 	SDL_DestroyTexture(message);
@@ -186,7 +186,7 @@ void Screen::menu(string names[10], int scores[10]) {
 			}
 		}
 	}
-	SDL_RenderClear(renderer);
+
 	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);

@@ -14,3 +14,5 @@
 * The configure file allows for some modifications of the game, including the resolution. Try different resolutions at your own risks: not everything is scaled or handled for different screen sizes. 
 * Highscores are "hidden" in an encrypted json file. On corruption the game might fail due to an assertion failure in rapidjson library. To fix, delete the highscore list.
 * Some changes in the configuration prevent ones score to be counted to the leaderboard. This is merely to preserve fair game.
+* Sliding speed has to be at least 1. At that speed the block moves sideways once per one tick.
+* The default grid/board that also gets scored is 10x19.
