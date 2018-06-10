@@ -92,7 +92,8 @@ Uint32 sliderR(Uint32 interval, void * arg) {
 
 
 void Events::setDropSpeed() {
-	currentInterval = startInt - 25*(g->droppedAmount()/10);
+	if (!sPressed) currentInterval = startInt - 25*(g->droppedAmount()/10);
+	else currentInterval = (Uint32)max((int)(startInt - 25*(g->droppedAmount()/10)) / 6, 20);
 }
 
 
@@ -407,10 +408,6 @@ int Events::init() {
 		}
 		// Update the drop speed.
 		setDropSpeed();
-		if (sPressed) {
-			currentInterval = (Uint32)max((int)currentInterval / 6, 20);
-		}
-
 
 		// Do the next thing on call queue.
 		try {

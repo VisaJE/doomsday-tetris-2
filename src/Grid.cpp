@@ -103,7 +103,7 @@ void Grid::moveR() {
 bool Grid::addBlock(Block block) {
 		if (!lost) {
 			staticBlock.refresh(grid);
-			points += pow(staticBlock.trim(), 2)*20;
+			points += pow(staticBlock.trim(), 2)*30;
 			dropBlock = block;
 			blockPos[0] = 0;
 			blockPos[1] = (width - block.width)/2;
