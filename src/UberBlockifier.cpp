@@ -42,10 +42,18 @@ Block UberBlockifier::makeRandom() {
 		if (index < 0 || index >= possibilities.size()) {
 			bGrid[possibilities[0]] = true;
 		} else bGrid[possibilities[index]] = true;
+		for (int i = 0; i < a; i++) {
+			for (int j = 0; j < b; j++) {
+				if (bGrid[i*b+j]) cout << "O";
+				else cout << " ";
+			}
+			cout << endl;
+		}
 		--blockAmount;
 	}
 	int dimensions[2] = {a, b};
 	bGrid = trimGrid(bGrid, dimensions);
+
 	Block res(dimensions[0], dimensions[1], bGrid);
 	if (dimensions[0] > dimensions[1]) {
 		res.rotate();
@@ -61,14 +69,13 @@ Block UberBlockifier::makeRandom() {
 
 
 vector<bool> UberBlockifier::trimGrid(vector<bool> in, int size[2]) {
-	for (int a = 1; a < 3; a++ ) {
 		for (int i = size[0]-1; i>=0;i--) {
 			bool empty = true;
 			for (int j = 0; j<size[1];j++) {
 				if (in[i*size[1] + j]) {empty = false;}
 			}
 			if (empty) {
-				in.erase(in.begin() + i*size[0], in.begin() + i*size[0] + size[1]);
+				in.erase(in.begin() + i*size[1], in.begin() + i*size[1] + size[1]);
 				size[0] -= 1;
 			}
 		}
@@ -84,8 +91,7 @@ vector<bool> UberBlockifier::trimGrid(vector<bool> in, int size[2]) {
 				size[1] -= 1;
 			}
 		}
-	}
-	return in;
+		return in;
 }
 
 
@@ -130,15 +136,10 @@ Block UberBlockifier::getABlock() {
 	if (r == 4) {
 		try {
 			Block b = makeRandom();
-			if (b.width != 2 || b.height != 2) {
-				return b;
-			}
-			else if ( (b.isThere(0,0) && !b.isThere(0,1)) || (b.isThere(0,1)  && !b.isThere(0,0))) {
-				return makeRandom();
-			}
 			return b;
 		}
 		catch (int e) {
+			cout << "unexpected error in randomizing";
 			return makeRandom();
 		}
 	}
@@ -163,19 +164,22 @@ void UberBlockifier::test(unsigned int times) {
 	unsigned int i = 0;
 	while (i < times) {
 		try {
-			Block b = getABlock();
+			Block b = getRandom();
+			if ( (b.width==2 && b.height == 2) && ((b.isThere(0,0) && !b.isThere(0,1)) || (b.isThere(0,1)  && !b.isThere(0,0)))) {
+				cout << endl << "MISTAKE-----------------------" << endl;
 
-			cout << "Size: " << b.height << ", " << b.width << endl;
-			for (int y = 0; y < b.height; y++) {
-				for (int x = 0; x < b.width; x++) {
-					if (b.isThere(y, x)) {
-						cout << "O";
+				cout << "Size: " << b.height << ", " << b.width << endl;
+				for (int y = 0; y < b.height; y++) {
+					for (int x = 0; x < b.width; x++) {
+						if (b.isThere(y, x)) {
+							cout << "O";
+						}
+						else {cout << " ";}
 					}
-					else {cout << " ";}
+					cout << endl;
 				}
-				cout << endl;
+				cout << "---- next ----" << endl;
 			}
-			cout << "---- next ----" << endl;
 		} catch (int e) {
 					cout << "making random failed" << endl;
 				}
