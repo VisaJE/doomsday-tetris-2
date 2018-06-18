@@ -42,13 +42,6 @@ Block UberBlockifier::makeRandom() {
 		if (index < 0 || index >= possibilities.size()) {
 			bGrid[possibilities[0]] = true;
 		} else bGrid[possibilities[index]] = true;
-		for (int i = 0; i < a; i++) {
-			for (int j = 0; j < b; j++) {
-				if (bGrid[i*b+j]) cout << "O";
-				else cout << " ";
-			}
-			cout << endl;
-		}
 		--blockAmount;
 	}
 	int dimensions[2] = {a, b};
