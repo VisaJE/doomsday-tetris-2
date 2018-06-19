@@ -13,6 +13,7 @@
 #include <math.h>
 #include "BoxTexture.h"
 #include <vector>
+#include <string>
 #include <sstream>
 #include <iomanip>
 
@@ -150,7 +151,6 @@ void Screen::printHelp(SDL_Rect rect) {
 	rect.h = min(texH, rect.h);
 
 	SDL_RenderCopy(renderer, message, NULL, &rect);
-	SDL_RenderPresent(renderer);
 	SDL_DestroyTexture(message);
 	SDL_FreeSurface(textSurf);
 }
@@ -189,7 +189,6 @@ void Screen::menu(string names[10], int scores[10]) {
 
 	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
 	printHelp(textArea);
 
 	SDL_Rect hsArea;
@@ -198,6 +197,7 @@ void Screen::menu(string names[10], int scores[10]) {
 	hsArea.w = bottomRight[1]-45 - hsArea.x;
 	hsArea.h = textArea.y - hsArea.y;
 	printHS(hsArea, names, scores);
+	SDL_RenderPresent(renderer);
 }
 
 
@@ -246,7 +246,6 @@ void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10]) {
 	hsArea.w = min(texW, hsArea.w);
 	hsArea.h = min(texH, hsArea.h);
 	SDL_RenderCopy(renderer, message, NULL, &hsArea);
-	SDL_RenderPresent(renderer);
 	SDL_DestroyTexture(message);
 	SDL_FreeSurface(textSurf);
 }
