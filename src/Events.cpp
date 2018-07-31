@@ -101,8 +101,7 @@ int Events::setHighscore() {
 	bool done = false;
 	if (!fairToScore) {
 		screen->gameOver("Your configuration is not fair for scoring.");
-		while (!quit && !done) {
-				while(SDL_PollEvent(&event)) {
+				while(!quit && !done && SDL_WaitEvent(&event)) {
 					switch (event.type) {
 					case SDL_QUIT: {
 						quit = true;
@@ -113,14 +112,12 @@ int Events::setHighscore() {
 					}
 					}
 				}
-		}
 		return 0;
 	}
 	if (g->getPoints()<hs.getLowest()) {
 
 		screen->gameOver("Your score was not enough\nto reach the leaderboard.");
-		while (!quit && !done) {
-				while(SDL_PollEvent(&event)) {
+				while(!quit && !done && SDL_WaitEvent(&event)) {
 					switch (event.type) {
 					case SDL_QUIT: {
 						quit = true;
@@ -131,7 +128,6 @@ int Events::setHighscore() {
 					}
 					}
 				}
-		}
 		return 0;
 	}
 	string t;
@@ -139,8 +135,7 @@ int Events::setHighscore() {
 	string text ="Enter your name to be\nremembered among the best:\n";
 	screen->gameOver(text);
 	SDL_StartTextInput();
-	while (!quit && !done) {
-			while(SDL_PollEvent(&event)) {
+			while(!quit && !done && SDL_WaitEvent(&event)) {
 				switch (event.type) {
 				case SDL_QUIT: {
 					quit = true;
@@ -181,7 +176,6 @@ int Events::setHighscore() {
                 	}
 				}
 			}
-	}
 	SDL_StopTextInput();
 	return 0;
 }
@@ -193,8 +187,7 @@ int Events::menu() {
 	hs.getHighscore(names, scores);
 	screen->menu(names, scores);
 	int err = 0;
-	while (!quit) {
-		while(SDL_PollEvent(&event)) {
+		while(!quit && SDL_WaitEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT: {
 				quit = true;
@@ -222,7 +215,6 @@ int Events::menu() {
 			}
 			}
 		}
-	}
 	return err;
 }
 
@@ -433,8 +425,7 @@ int Events::init() {
 bool Events::pause() {
 	paused = true;
 	screen->pause();
-	while (!quit && paused) {
-		while(SDL_PollEvent(&event)) {
+		while(!quit && paused && SDL_WaitEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT: {
 					quit = true;
@@ -450,7 +441,6 @@ bool Events::pause() {
 				}
 			}
 		}
-	}
 	setDropSpeed();
 	return !quit;
 }
