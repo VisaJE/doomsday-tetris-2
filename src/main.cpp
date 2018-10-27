@@ -10,13 +10,11 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include "Screen.h"
-#include "Events.h"
 #include "Grid.h"
 #include "Conf.h"
-#include "Highscorer.h"
-
+#include "StaticBlock.h"
 #include "UberBlockifier.h"
-
+#include "Events.h"
 using namespace std;
 using namespace tet;
 
@@ -37,15 +35,14 @@ int main()  {
 	int screenHeight = conf.screenHeight;
 	int screenWidth = conf.screenWidth;
 
-
 	UberBlockifier blockGen(boardWidth);
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
-	Grid gameGrid = Grid(b, blockGen, boardHeight, boardWidth);
+	Grid gameGrid(b, blockGen, boardHeight, boardWidth);
 
 	// Initialise
-	Screen screen = Screen(screenHeight, screenWidth, &gameGrid);
+	Screen screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler = Events(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid());
+	Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid());
 	eventHandler.menu();
 
 	SDL_Quit();

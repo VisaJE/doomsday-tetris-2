@@ -341,8 +341,14 @@ int Events::init() {
 							if (g->lost) {
 								SDL_UnlockMutex(mutex);
 								SDL_RemoveTimer(timer);
-								if (aPressed) {SDL_RemoveTimer(slideLTimer);}
-								if (dPressed) {SDL_RemoveTimer(slideRTimer);}
+								if (aPressed) {
+                                    SDL_RemoveTimer(slideLTimer);
+                                    aPressed=false;
+                                }
+								if (dPressed) {
+                                    SDL_RemoveTimer(slideRTimer);
+                                    dPressed=false;
+                                }
 								return 0;
 							}
 							else break;
@@ -351,8 +357,14 @@ int Events::init() {
 						case SDLK_ESCAPE : {
 							SDL_UnlockMutex(mutex);
 							SDL_RemoveTimer(timer);
-							if (aPressed) {SDL_RemoveTimer(slideLTimer);}
-							if (dPressed) {SDL_RemoveTimer(slideRTimer);}
+							if (aPressed) {
+                                SDL_RemoveTimer(slideLTimer);
+                                aPressed=false;
+                            }
+							if (dPressed) {
+                                SDL_RemoveTimer(slideRTimer);
+                                dPressed=false;
+                            }
 							return 0;
 						}
 						// ERROR INFO
