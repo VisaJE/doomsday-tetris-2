@@ -164,7 +164,8 @@ void Grid::rotate() {
 		int xPosFix = oldCenter[1] - newCenter[1];
 		int y = max(blockPos[0] + yPosFix, 0);
 		int x = blockPos[1] + xPosFix;
-		int sideTreshold = (int)ceil(dropBlock.width/2);
+		int sideTreshold = (int)ceil(dropBlock.width/2.0);
+   //     cout << "sliding at most " << sideTreshold << endl;
 		if (slide(y, x, sideTreshold)) {
 			refresh();
 		} else {

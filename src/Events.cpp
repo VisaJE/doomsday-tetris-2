@@ -55,7 +55,11 @@ bool Events::goingRight() {
 	return dPressed;
 }
 
-
+Uint32 voidFunc(Uint32 interval, void *arg) {
+    (void)interval;
+    (void)arg;
+    return interval;
+}
 Uint32 ticker(Uint32 interval, void * arg) {
     (void)interval;
 	Events *event = (Events*)arg;
@@ -102,8 +106,10 @@ Uint32 sliderR(Uint32 interval, void * arg) {
 
 
 void Events::setDropSpeed() {
-	if (!sPressed) currentInterval = startInt - ((int) g->droppedAmount()/10 )*currentInterval/10;
-	else currentInterval = (Uint32)max((int)(startInt - ((int) g->droppedAmount()/10)*currentInterval/60), 20);
+    int baseSpeed= max((int)(startInt - sqrt((g->droppedAmount()/10)*10000)), 10);
+	if (!sPressed) currentInterval = baseSpeed;
+	else currentInterval =baseSpeed/6; 
+    //cout << "Current interval set to " << currentInterval << endl << "Is s pressed " << sPressed << endl;
 }
 
 
@@ -233,8 +239,10 @@ int Events::init() {
 	setDropSpeed();
 	paused = false;
 	SDL_TimerID timer = SDL_AddTimer(startInt, &ticker, this);
-	SDL_TimerID slideRTimer;
-	SDL_TimerID slideLTimer;
+	SDL_TimerID slideRTimer = SDL_AddTimer(startInt, &voidFunc, this);
+	SDL_TimerID slideLTimer = SDL_AddTimer(startInt, &voidFunc, this);
+    SDL_RemoveTimer(slideLTimer);
+    SDL_RemoveTimer(slideRTimer); //This is done to remove a warning of non initialized timers.
 	aPressed = false;
 	sPressed = false;
 	dPressed = false;
