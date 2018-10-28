@@ -27,8 +27,15 @@ struct Tick {
 };
 
 
-Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool scoreable): paused(true), slideSpeed(slideSpeed),
-		g(g), currentInterval(startInterval), fairToScore(scoreable), startInt(startInterval), screen(s) {
+Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool scoreable, bool& fastDropInitiated):
+    paused(true),
+    slideSpeed(slideSpeed),
+	g(g),
+    currentInterval(startInterval),
+    fairToScore(scoreable),
+    startInt(startInterval),
+    screen(s),
+    sPressed(fastDropInitiated) {
 	quit = false;
 	mutex = SDL_CreateMutex();
 }
@@ -50,6 +57,7 @@ bool Events::goingRight() {
 
 
 Uint32 ticker(Uint32 interval, void * arg) {
+    (void)interval;
 	Events *event = (Events*)arg;
 	if (SDL_LockMutex(event->mutex)==0) {
 		if (event->g->lost || event->paused || event->quit) {
@@ -64,6 +72,7 @@ Uint32 ticker(Uint32 interval, void * arg) {
 
 
 Uint32 sliderL(Uint32 interval, void * arg) {
+    (void)interval;
 	Events *event = (Events*)arg;
 	if (SDL_LockMutex(event->mutex) == 0) {
 		if (event->g->lost || event->paused || event->quit) {
@@ -78,6 +87,7 @@ Uint32 sliderL(Uint32 interval, void * arg) {
 
 
 Uint32 sliderR(Uint32 interval, void * arg) {
+    (void)interval;
 	Events *event = (Events*)arg;
 	if (SDL_LockMutex(event->mutex) == 0) {
 		if (event->g->lost || event->paused || event->quit) {
@@ -92,8 +102,8 @@ Uint32 sliderR(Uint32 interval, void * arg) {
 
 
 void Events::setDropSpeed() {
-	if (!sPressed) currentInterval = startInt - 25*(g->droppedAmount()/10);
-	else currentInterval = (Uint32)max((int)(startInt - 25*(g->droppedAmount()/10)) / 6, 20);
+	if (!sPressed) currentInterval = startInt - ((int) g->droppedAmount()/10 )*currentInterval/10;
+	else currentInterval = (Uint32)max((int)(startInt - ((int) g->droppedAmount()/10)*currentInterval/60), 20);
 }
 
 
@@ -284,9 +294,10 @@ int Events::init() {
 									SDL_UnlockMutex(mutex);
 								}
 								SDL_RemoveTimer(timer);
-								currentInterval = (Uint32)max((int)currentInterval / 6, 20);
+                                sPressed = true;
+								setDropSpeed();
 								timer =  SDL_AddTimer(currentInterval, &ticker, this);
-								sPressed = true;
+
 							}
 							break;
 						}
@@ -396,9 +407,9 @@ int Events::init() {
 						case SDLK_s : case SDLK_DOWN : {
 							if (sPressed) {
 								SDL_RemoveTimer(timer);
+                                sPressed = false;
 								setDropSpeed();
-								timer =  SDL_AddTimer(currentInterval, &ticker, this);
-								sPressed = false;
+								timer =  SDL_AddTimer(currentInterval, &ticker, this);	
 							}
 							break;
 						}

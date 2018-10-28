@@ -17,7 +17,13 @@ using namespace std;
 namespace tet {
 
 // Grid class also handles the grid of the staticBlock. Deleted at the destructor!
-Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int boardWidth):  height(boardHeight), width(boardWidth), staticBlock(inp), blockGen(uber), dropBlock(blockGen.getABlock()) {
+Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int boardWidth, bool& isFastDrop):
+    height(boardHeight),
+    width(boardWidth),
+    staticBlock(inp),
+    blockGen(uber),
+    dropBlock(blockGen.getABlock()),
+    isFastDrop(isFastDrop) {
 	for (int i = 0; i<height*width;i++) {
 		grid.push_back(false);
 	}
@@ -197,7 +203,7 @@ void Grid::wholeDrop() {
 		if (!addBlock(blockGen.getABlock())) {
 			lost = true;
 		}
-		points += p*5*dropBlock.mass;
+		points += p*4*dropBlock.mass;
 	}
 }
 
@@ -209,7 +215,8 @@ void Grid::wholeTick() {
 				lost = true;
 			}
 		}
-		points += dropBlock.mass;
+        if (isFastDrop) points += 2*dropBlock.mass;
+		else points += dropBlock.mass;
 	}
 }
 

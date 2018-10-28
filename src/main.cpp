@@ -37,12 +37,13 @@ int main()  {
 
 	UberBlockifier blockGen(boardWidth);
 	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
-	Grid gameGrid(b, blockGen, boardHeight, boardWidth);
+    bool fastDropInitiated = false;
+	Grid gameGrid(b, blockGen, boardHeight, boardWidth, fastDropInitiated);
 
 	// Initialise
 	Screen screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid());
+	Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid(), fastDropInitiated);
 	eventHandler.menu();
 
 	SDL_Quit();

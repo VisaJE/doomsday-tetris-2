@@ -18,7 +18,7 @@ namespace tet {
 
 class Grid {
 public:
-	Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth);
+	Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth, bool& isFastDrop);
 	virtual ~Grid();
 	bool lost = false;
 	int height;
@@ -43,6 +43,7 @@ private:
 	StaticBlock staticBlock;
 	UberBlockifier blockGen;
 	Block dropBlock;
+    bool& isFastDrop;
 	vector<bool> grid;
 	int blockPos[2]; // (y, x)
 	bool slide(int y, int x, int l);

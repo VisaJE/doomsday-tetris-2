@@ -20,7 +20,7 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable);
+	Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable, bool &fastDropInitiated);
 	virtual ~Events();
 	bool paused;
 	bool quit;
@@ -30,7 +30,6 @@ public:
 	Grid *g;
 	int init();
 	int menu();
-
 	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
@@ -42,7 +41,7 @@ private:
 	int startInt;
 	SDL_Event event;
 	Screen* screen;
-	bool sPressed = false;
+	bool& sPressed; //sPressed is now a reference to a common bool between events and grid.
 	bool aPressed = false;
 	bool dPressed = false;
 	bool pause();
