@@ -39,6 +39,8 @@ private:
 	bool fairToScore;
 	int setHighscore();
 	int startInt;
+    int baseInterval;
+    bool speedUpdated =true;//Keeps track whether the base interval has been updated for this block.
 	SDL_Event event;
 	Screen* screen;
 	bool& sPressed; //sPressed is now a reference to a common bool between events and grid.

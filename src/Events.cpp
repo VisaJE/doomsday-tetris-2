@@ -34,6 +34,7 @@ Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool score
     currentInterval(startInterval),
     fairToScore(scoreable),
     startInt(startInterval),
+    baseInterval(startInt),
     screen(s),
     sPressed(fastDropInitiated) {
 	quit = false;
@@ -106,9 +107,14 @@ Uint32 sliderR(Uint32 interval, void * arg) {
 
 
 void Events::setDropSpeed() {
-    int baseSpeed= max((int)(startInt - sqrt((g->droppedAmount()/10)*10000)), 10);
-	if (!sPressed) currentInterval = baseSpeed;
-	else currentInterval =baseSpeed/6; 
+    if (g->droppedAmount() % 10 == 0) {
+        if (!speedUpdated) {
+            baseInterval = max((int)(startInt - sqrt((g->droppedAmount()/10)*10000)), 10);
+            speedUpdated=true;
+        }
+    } else speedUpdated=false;
+	if (!sPressed) currentInterval = baseInterval;
+	else currentInterval =baseInterval/6; 
     //cout << "Current interval set to " << currentInterval << endl << "Is s pressed " << sPressed << endl;
 }
 
