@@ -176,6 +176,7 @@ int Events::setHighscore() {
                 	case SDLK_BACKSPACE:
                 		if (len > 0) {
                 			--len;
+                		    if((int) t.back()< 0) t.pop_back();
                 			t.pop_back();
                 			string temp = text;
                 			screen->gameOver(temp.append(t));
@@ -184,7 +185,8 @@ int Events::setHighscore() {
                 	case SDLK_RETURN :
                 		if (len > 0) {
                 			while (t.length()> 10) {
-                				t.pop_back();
+                		        if((int) t.back()< 0) t.pop_back();
+                                t.pop_back();
                 			}
                 			hs.addScore(t, g->getPoints());
                 			done = true;

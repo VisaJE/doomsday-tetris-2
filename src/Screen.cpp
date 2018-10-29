@@ -143,7 +143,7 @@ bool doomText[] = 	{	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 void Screen::printHelp(SDL_Rect rect) {
 	const char* text = "Key bindings:\n\nP - pause           R - restart\nS - fast drop       W - rotate\nA,D   - slide        SPACE - immediate drop\nESC   - menu\n\nPress enter.";
-	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(textFont, text, textColor, rect.w);
+	SDL_Surface* textSurf = TTF_RenderUTF8_Blended_Wrapped(textFont, text, textColor, rect.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;
 	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
@@ -209,7 +209,7 @@ void Screen::gameOver(string text) {
 	r.h = bottomRight[0] - r.y;
 
 	const char* t = text.c_str();
-	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(scoreFont, t, textColor, r.w);
+	SDL_Surface* textSurf = TTF_RenderUTF8_Blended_Wrapped(scoreFont, t, textColor, r.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;
 	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
@@ -239,7 +239,7 @@ void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10]) {
 	t << 10 << ". " << names[9] << string(10-names[9].size(), ' ') << " -   " << scores[9] << "\n";
 	string  s = t.str();
 	const char* text = s.c_str();
-	SDL_Surface* textSurf = TTF_RenderText_Blended_Wrapped(scoreFont, text, {160, 200, 50}, hsArea.w);
+	SDL_Surface* textSurf = TTF_RenderUTF8_Blended_Wrapped(scoreFont, text, {160, 200, 50}, hsArea.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;
 	SDL_QueryTexture(message, NULL, NULL, &texW, &texH);
@@ -271,7 +271,7 @@ void Screen::refresh() {
 		}
 		string t = text.str();
 		const char* finalText = t.c_str();
-		SDL_Surface* gameInfo = TTF_RenderText_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
+		SDL_Surface* gameInfo = TTF_RenderUTF8_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
 		SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, gameInfo);
 		int texW = 0;
 		int texH = 0;
@@ -352,7 +352,7 @@ void Screen::pause() {
 	}
 	string t = text.str();
 	const char* finalText = t.c_str();
-	SDL_Surface* gameInfo = TTF_RenderText_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
+	SDL_Surface* gameInfo = TTF_RenderUTF8_Blended_Wrapped(font, finalText, textColor, SCREEN_WIDTH);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, gameInfo);
 	int texW = 0;
 	int texH = 0;
