@@ -361,6 +361,7 @@ int Events::init() {
 //							g.printGrid();
 							screen->printGrid();
 							} catch (int i) {}
+                            setDropSpeed();
 							break;
 							}
 						// If game over go to menu.
