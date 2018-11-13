@@ -385,6 +385,7 @@ int Events::init() {
 						case SDLK_ESCAPE : {
 							SDL_UnlockMutex(mutex);
 							SDL_RemoveTimer(timer);
+                            g->wholeTick();
 							if (aPressed) {
                                 SDL_RemoveTimer(slideLTimer);
                                 aPressed=false;
@@ -393,6 +394,7 @@ int Events::init() {
                                 SDL_RemoveTimer(slideRTimer);
                                 dPressed=false;
                             }
+                            sPressed = false;
 							return 0;
 						}
 						// ERROR INFO
