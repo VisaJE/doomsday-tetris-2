@@ -244,6 +244,7 @@ int Events::menu() {
 
 
 int Events::init() {
+    speedUpdated = false;
 	setDropSpeed();
 	paused = false;
 	SDL_TimerID timer = SDL_AddTimer(startInt, &ticker, this);
@@ -361,6 +362,7 @@ int Events::init() {
 //							g.printGrid();
 							screen->printGrid();
 							} catch (int i) {}
+                            speedUpdated = false;
                             setDropSpeed();
 							break;
 							}
