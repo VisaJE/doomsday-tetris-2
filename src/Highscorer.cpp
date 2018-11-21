@@ -211,10 +211,10 @@ string Highscorer::readFile() {
 	file = fopen(".hs.json", "rb");
 	stringstream s;
 	char c;
-	while (c != EOF ) {
+	do {
 		c = fgetc(file);
 		s << c;
-	}
+	} while (c != EOF );
 	string out = decrypt(s.str(), key);
 	while(out.back() != '}' && out.size() > 0){
 		out.pop_back();

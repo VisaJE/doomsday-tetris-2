@@ -9,4 +9,5 @@
 /.hs.json
 /.cproject
 /.vimrc
+/.obj/*
 /Release/
