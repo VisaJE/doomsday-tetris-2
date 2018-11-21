@@ -2,6 +2,7 @@
 # feedback-system Makefile
 #
 # ---------------------
+
 EXE = DoomsdayTetris2
 
 #Put Rapidjson include folder here
@@ -12,6 +13,8 @@ LDLIBS= -lSDL2main -lSDL2 -lSDL2_ttf
 
 SRC_DIR = src
 OBJ_DIR = obj
+$(shell if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi)
+
 SRC = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)		
 $(info $$SRC is [${SRC}])
