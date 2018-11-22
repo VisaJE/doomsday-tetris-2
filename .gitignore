@@ -9,5 +9,8 @@ config.json
 .hs.json
 .cproject
 .vimrc
-.obj
+obj
 Release/
+GlobalLeadercpp
+GlobalLeaderh
+Server
