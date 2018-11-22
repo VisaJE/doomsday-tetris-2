@@ -1,5 +1,7 @@
-.settings/
-Debug/
+.settings
+Debug
+DoomsdayTetris2
+DoomsdayTetris2.exe
 SDL2.dll
 SDL2_ttf.dll
 zlib1.dll
@@ -9,7 +11,7 @@ config.json
 .hs.json
 .cproject
 .vimrc
-obj
+obj/
 Release/
 GlobalLeadercpp
 GlobalLeaderh
