@@ -2,6 +2,7 @@
 Debug
 DoomsdayTetris2
 DoomsdayTetris2.exe
+.server_config.json
 SDL2.dll
 SDL2_ttf.dll
 zlib1.dll

@@ -6,7 +6,7 @@
 EXE = DoomsdayTetris2
 
 #Put Rapidjson include folder here
-CXXFLAGS = -IC:\Users\Eemil\Documents\Ohjelmointi\rapidjson\include -Wall -O2
+CXXFLAGS = -I/home/visakoe1/ohjelmointi/rapidjson/include -Wall -O2
 
 LDFLAGS=-g
 LDLIBS= -lSDL2main -lSDL2 -lSDL2_ttf

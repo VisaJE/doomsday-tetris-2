@@ -1,0 +1,35 @@
+#pragma once
+
+#include <iostream>
+#include <libpq-fe.h>
+
+typedef enum {
+    connUNKNOWN,
+    connFAIL,
+    connSUCCESS,
+    connDISCONNECTED
+} connStatus;
+namespace tet {
+class SqlConn {
+    public:
+        SqlConn(const char* dbname,
+                const char* port="",
+                const char* hostaddr="",
+                const char* hostname="local",
+                const char* username="",
+                const char* password="",
+                const char* table="doomsdaytetris");
+        virtual ~SqlConn();
+        void topList(char* names[10], int scores[10]);
+        void pushList(const char* names[10], int scores[10]);
+        connStatus connectionStatus;
+    private:
+        const char* tablename;
+        PGconn *conn;
+        PGresult *result;
+        void exit(PGconn *conn);
+        bool getLowest(int& score);
+        bool pushToServer(const char* names[10], int scores[10]);
+
+};
+}

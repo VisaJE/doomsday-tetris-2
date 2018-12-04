@@ -15,20 +15,31 @@
 #include "StaticBlock.h"
 #include "UberBlockifier.h"
 #include "Events.h"
+#include "WebConf.h"
 using namespace std;
 using namespace tet;
 
 
 int main()  {
-
 	// Initialise SDL
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		cout << "FAIL" << endl;
 		return 1;
 	}
-
-	// Configuring
+    //First we test the new classes!
+    WebConf webc = WebConf();
+    cout << "Successfully created webconf!" << endl;
+    cout << "Found these" << endl;
+    for (auto s : webc.configuration)
+    {
+        cout << s.name << ", " << s.value << endl;
+    }
+    if (webc.serviceEnabled) cout << "Service is enabled" << endl;
+    else cout << "Service is not enabled" << endl;
+	
+    
+    // Configuring
 	Conf conf = Conf();
 	const int boardHeight = conf.boardHeight;
 	const int boardWidth = conf.boardWidth;
