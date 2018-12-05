@@ -114,7 +114,7 @@ void Events::setDropSpeed() {
         }
     } else speedUpdated=false;
 	if (!sPressed) currentInterval = baseInterval;
-	else currentInterval =baseInterval/6; 
+	else currentInterval =baseInterval/6;
     //cout << "Current interval set to " << currentInterval << endl << "Is s pressed " << sPressed << endl;
 }
 
@@ -204,6 +204,11 @@ int Events::setHighscore() {
 	return 0;
 }
 
+
+Highscorer& Events::getLocalHighscores()
+{
+    return hs;
+}
 
 int Events::menu() {
 	string names[10];
@@ -430,7 +435,7 @@ int Events::init() {
 								SDL_RemoveTimer(timer);
                                 sPressed = false;
 								setDropSpeed();
-								timer =  SDL_AddTimer(currentInterval, &ticker, this);	
+								timer =  SDL_AddTimer(currentInterval, &ticker, this);
 							}
 							break;
 						}

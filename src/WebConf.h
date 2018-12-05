@@ -12,11 +12,12 @@ typedef struct {
 } ConfEntry;
 
 namespace tet {
-
+//TODO: SHOULD SANITIZE THE CONFIG
 class WebConf{
 public:
     WebConf();
     virtual ~WebConf();
+    void initiate();
     bool serviceEnabled;
     std::vector<ConfEntry> configuration;
 private:

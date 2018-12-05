@@ -33,7 +33,7 @@ public:
 	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
-
+    Highscorer& getLocalHighscores();
 private:
 	Highscorer hs = Highscorer();
 	bool fairToScore;

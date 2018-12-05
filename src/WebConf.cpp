@@ -18,6 +18,10 @@ using namespace tet;
 WebConf::WebConf()
 {
     configuration = std::vector<ConfEntry>();
+    serviceEnabled = false;
+}
+void WebConf::initiate()
+{
     if (!readConf()) makeConf();
 }
 
@@ -54,7 +58,6 @@ bool WebConf::checkValidity(Document *doc)
     Value::MemberIterator enabled = doc->FindMember("enabled");
     if (enabled == doc->MemberEnd()) valid = false;
     if (!enabled->value.IsBool()) valid = false;
-    std::cout << "I wonder if were valid " << valid << std::endl;
     return valid;
 }
 
@@ -77,7 +80,6 @@ void WebConf::setConf(Document *doc)
 
 void WebConf::makeConf()
 {
-    std::cout << "MAking a new configuration file" << std::endl;
     serviceEnabled = false;
     std::stringstream defaultString;
     defaultString << "\{\n\"enabled\": false";

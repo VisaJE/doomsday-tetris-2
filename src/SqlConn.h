@@ -2,9 +2,11 @@
 
 #include <iostream>
 #include <libpq-fe.h>
+#include <vector>
+#include "WebConf.h"
 
 typedef enum {
-    connUNKNOWN,
+    connNOTINITIALIZED,
     connFAIL,
     connSUCCESS,
     connDISCONNECTED
@@ -12,24 +14,19 @@ typedef enum {
 namespace tet {
 class SqlConn {
     public:
-        SqlConn(const char* dbname,
-                const char* port="",
-                const char* hostaddr="",
-                const char* hostname="local",
-                const char* username="",
-                const char* password="",
-                const char* table="doomsdaytetris");
+        SqlConn();
+        SqlConn(std::vector<ConfEntry> &config);
         virtual ~SqlConn();
         void topList(char* names[10], int scores[10]);
         void pushList(const char* names[10], int scores[10]);
         connStatus connectionStatus;
     private:
-        const char* tablename;
+        std::string tablename;
         PGconn *conn;
         PGresult *result;
         void exit(PGconn *conn);
         bool getLowest(int& score);
-        bool pushToServer(const char* names[10], int scores[10]);
+        bool pushToServer(std::string names[10], int scores[10]);
 
 };
 }
