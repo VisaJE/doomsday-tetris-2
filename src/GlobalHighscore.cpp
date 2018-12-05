@@ -15,7 +15,14 @@ GlobalHighscore::GlobalHighscore(Events& context): context(context)
         return;
     }
     SqlConn connection = SqlConn(configuration.configuration);
-    //cout << "Made SqlConn" << connection.connectionStatus << endl;
+    cout << "Made SqlConn" << connection.connectionStatus << endl;
+    int scores[10];
+    std::string names[10];
+    connection.topList(names, scores);
+    for (int i = 0; i < 10; i++)
+    {
+        cout << names[i] << ": " << scores[i] <<endl;
+    }
 }
 
 GlobalHighscore::~GlobalHighscore()

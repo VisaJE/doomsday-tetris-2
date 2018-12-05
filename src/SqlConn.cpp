@@ -18,10 +18,14 @@ SqlConn::SqlConn(std::vector<ConfEntry>& config)
     for (auto i : config)
     {
         if (i.name.compare("table") == 0) tablename = i.value;
-        else connInfo << i.name << "='" << i.value << "',";
+        else if (i.value.length() >= 1)
+        {
+            connInfo << i.name << "='" << i.value << "' ";
+        }
     }
+    if (connInfo.str().length() < 1) conn = PQconnectdb("");
     std::cout << "Connecting with parameters ";
-    std::cout<< connInfo.str().substr(0, connInfo.str().length()-1).c_str()<<std::endl;
+    std::cout<< connInfo.str().substr(0, connInfo.str().length()-1).c_str()<<"!"<<std::endl;
     //Eww
     conn = PQconnectdb(connInfo.str().substr(0, connInfo.str().length()-1).c_str());
 
@@ -30,7 +34,6 @@ SqlConn::SqlConn(std::vector<ConfEntry>& config)
         std::cout << "Connection failed" << std::endl;
         exit(conn);
         connectionStatus = connFAIL;
-        std::cout << connectionStatus << std::endl;
     } else connectionStatus = connSUCCESS;
 }
 
@@ -46,7 +49,7 @@ void SqlConn::exit(PGconn *conn)
     connectionStatus = connDISCONNECTED;
 }
 
-void SqlConn::topList(char* names[10], int scores[10])
+void SqlConn::topList(std::string names[10], int scores[10])
 {
     if (PQstatus(conn) != CONNECTION_OK)
     {
@@ -68,9 +71,11 @@ void SqlConn::topList(char* names[10], int scores[10])
        names[i] = PQgetvalue(result, i, PQfnumber(result, "name"));
        char* scoreChar = PQgetvalue(result, i, PQfnumber(result, "score"));
        int res = 0;
-       for (int offset = 0; offset < 4; offset++)
+       int offset= -1;
+       while (scoreChar[++offset] != 0)
        {
-            res += scoreChar[offset] << (8*offset); //TODO: TEST IF THIS WORKS
+            std::cout << scoreChar[offset] << "," << std::endl;
+            res += (offset+1)*10*(scoreChar[offset]-'0');
        }
        scores[i] = res;
     }

@@ -17,7 +17,7 @@ class SqlConn {
         SqlConn();
         SqlConn(std::vector<ConfEntry> &config);
         virtual ~SqlConn();
-        void topList(char* names[10], int scores[10]);
+        void topList(std::string names[10], int scores[10]);
         void pushList(const char* names[10], int scores[10]);
         connStatus connectionStatus;
     private:

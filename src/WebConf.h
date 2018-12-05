@@ -29,8 +29,8 @@ private:
                 "dbname",
                 "port",
                 "hostaddr",
-                "hostname",
-                "username",
+                "host",
+                "user",
                 "password",
                 "table"};
 };
