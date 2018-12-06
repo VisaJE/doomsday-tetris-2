@@ -227,29 +227,31 @@ int Events::menu() {
 			}
 			case SDL_KEYDOWN : {
 				switch (event.key.keysym.sym)
-				case SDLK_RETURN : {
-					err = init();
-					if (g->lost && err == 0) {
-						err = setHighscore();
-						g->reset();
-						while (callQue.size()!=0){
-							callQue.pop();
-						}
-					}
-					hs.getHighscore(names, scores);
-					screen->menu(names, scores);
-					break;
-				}
-                case SDLK_u :
-                {
-                    globalScoreList();
-                    screen->menu(names, scores);
-                    break;
-                }
-			/*	case SDLK_ESCAPE : {
-					quit = true;
-					break;
-				}*/
+        {
+          case SDLK_RETURN : {
+            err = init();
+            if (g->lost && err == 0) {
+              err = setHighscore();
+              g->reset();
+              while (callQue.size()!=0){
+                callQue.pop();
+              }
+            }
+            hs.getHighscore(names, scores);
+            screen->menu(names, scores);
+            break;
+          }
+          case SDLK_g :
+          {
+            globalScoreList();
+            screen->menu(names, scores);
+            break;
+          }
+        /*	case SDLK_ESCAPE : {
+            quit = true;
+            break;
+          }*/
+        }
 			}
 			}
 		}
