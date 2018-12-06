@@ -7,6 +7,7 @@ SDL2.dll
 SDL2_ttf.dll
 zlib1.dll
 libfreetype-6.dll
+Makefile
 arial.ttf
 .cproject
 .vimrc
