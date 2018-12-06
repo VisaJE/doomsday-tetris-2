@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Events.h
  *
@@ -11,10 +12,9 @@
 #include "Grid.h"
 #include "UberBlockifier.h"
 #include "Highscorer.h"
+#include "GlobalHighscore.h"
 #include "queue"
 
-#ifndef EVENTS_H_
-#define EVENTS_H_
 
 namespace tet {
 
@@ -30,12 +30,14 @@ public:
 	Grid *g;
 	int init();
 	int menu();
+    int globalScoreList();
 	Uint32 currentInterval;
 	SDL_mutex *mutex;
 	std::queue<Grid::GridFunc> callQue;
     Highscorer& getLocalHighscores();
+    Highscorer hs;
 private:
-	Highscorer hs = Highscorer();
+    GlobalHighscore globalHs;
 	bool fairToScore;
 	int setHighscore();
 	int startInt;
@@ -53,4 +55,3 @@ private:
 
 } /* namespace tet */
 
-#endif /* EVENTS_H_ */

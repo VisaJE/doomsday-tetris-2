@@ -86,7 +86,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 	font = TTF_OpenFont("arial.ttf", 30);
 	textFont = TTF_OpenFont("arial.ttf", boxSize/3.0);
-	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.6);
+	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.7);
 
 	if (font == NULL && textFont == NULL) {
 		cout << "Font not found" << endl;
@@ -142,7 +142,7 @@ bool doomText[] = 	{	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 void Screen::printHelp(SDL_Rect rect) {
-	const char* text = "Key bindings:\n\nP - pause           R - restart\nS - fast drop       W - rotate\nA,D   - slide        SPACE - immediate drop\nESC   - menu\n\nPress enter.";
+	const char* text = "Key bindings:\n\nP - pause           R - restart\nS - fast drop       W - rotate\nA,D   - slide        SPACE - immediate drop\nESC   - menu     G - online leaderboards\n\nPress enter.";
 	SDL_Surface* textSurf = TTF_RenderUTF8_Blended_Wrapped(textFont, text, textColor, rect.w);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurf);
 	int texW, texH = 0;
@@ -196,7 +196,54 @@ void Screen::menu(string names[10], int scores[10]) {
 	hsArea.y = topLeft[0] + boxSize*5 +  45;
 	hsArea.w = bottomRight[1]-45 - hsArea.x;
 	hsArea.h = textArea.y - hsArea.y;
-	printHS(hsArea, names, scores);
+	printHS(hsArea, names, scores, "LEADERBOARD");
+	SDL_RenderPresent(renderer);
+}
+
+
+void Screen::gScorePanel(string names[10], int scores[10])
+{
+	SDL_Rect textArea;
+	textArea.x = topLeft[1] + 45;
+	textArea.y = bottomRight[0] - boxSize*3.6;
+	textArea.w = bottomRight[1] - topLeft[1];
+	textArea.h = bottomRight[0] - textArea.y;
+	for (int y = topLeft[0]; y < bottomRight[0]; y++) {
+		for (int x = topLeft[1]; x < bottomRight[1]; x++) {
+			int r = 30;
+			int g =  30;
+			int b = 50;
+			setPixel(y, x, r ,g ,b);
+		}
+	}
+	if (GRID->height > 5 && GRID->width > 9) {
+		for (int h = 0; h < 5; h++) {
+			for (int w = 0; w < 10; w++) {
+				if (doomText[h*10+w]) {
+					for (int y = 0; y < boxSize; y++) {
+						for (int x = 0; x < boxSize; x++) {
+							int r = 230*boxTexture.getIntensity(y, x);
+							int g = 150*boxTexture.getIntensity(y, x);
+							int b = 50;
+							setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH*sizeof(Uint32));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	printHelp(textArea);
+
+	SDL_Rect hsArea;
+	hsArea.x = topLeft[1] + 45;
+	hsArea.y = topLeft[0] + boxSize*5 +  45;
+	hsArea.w = bottomRight[1]-45 - hsArea.x;
+	hsArea.h = textArea.y - hsArea.y;
+    cout << "Printing global highscore area" << endl;
+	printHS(hsArea, names, scores, "GLOBAL LEADERS");
 	SDL_RenderPresent(renderer);
 }
 
@@ -230,13 +277,20 @@ void Screen::gameOver(string text) {
 }
 
 
-void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10]) {
+void Screen::printHS(SDL_Rect hsArea,string names[10], int scores[10],
+        const char* header) {
 	stringstream t;
-	t << "LEADERBOARD\n\n";
+	t << header <<"\n\n";
 	for (int i = 0; i < 9; i++) {
-		t << i+1 << ". " << names[i] << string(10-names[i].size(), ' ') << "   -   " << scores[i] << "\n";
+        if (names[i].size() > 10)
+        {
+            cout << "Wrong size found at" << i <<endl;
+            cout << names[i] << "!" << endl;
+            cout << names[i].size() << endl;
+        }
+	    t << i+1 << ". " << names[i] << string(11-names[i].size(), ' ') << "   -   " << scores[i] << "\n";
 	}
-	t << 10 << ". " << names[9] << string(10-names[9].size(), ' ') << " -   " << scores[9] << "\n";
+	t << 10 << ". " << names[9] << string(11-names[9].size(), ' ') << " -   " << scores[9] << "\n";
 	string  s = t.str();
 	const char* text = s.c_str();
 	SDL_Surface* textSurf = TTF_RenderUTF8_Blended_Wrapped(scoreFont, text, {160, 200, 50}, hsArea.w);

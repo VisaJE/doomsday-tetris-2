@@ -18,13 +18,15 @@ namespace tet {
 
 class Highscorer {
 public:
-	Highscorer();
+	Highscorer(const char* hs_filename);
 	virtual ~Highscorer();
 	void getHighscore(std::string name[10], int score[10]);
 	bool addScore(std::string name, int score);
+    void replaceList(std::string names[10], int scores[10]);
 	int getHighest();
 	int getLowest();
 private:
+    const char* hsFilename;
 	FILE* file;
 	void setFile(std::string t);
 	std::string readFile();

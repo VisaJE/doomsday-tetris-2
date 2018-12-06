@@ -46,9 +46,6 @@ int main()  {
 	Screen screen(screenHeight, screenWidth, &gameGrid);
 
 	Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid(), fastDropInitiated);
-    cout << "Making ghs" << endl;
-    GlobalHighscore ghs = GlobalHighscore(eventHandler);
-    cout << "Ghs made" << endl;
 	eventHandler.menu();
 
 	SDL_Quit();

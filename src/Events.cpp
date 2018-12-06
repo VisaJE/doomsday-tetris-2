@@ -32,11 +32,14 @@ Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool score
     slideSpeed(slideSpeed),
 	g(g),
     currentInterval(startInterval),
+    hs(Highscorer(".hs.json")),
+    globalHs(GlobalHighscore(&hs)),
     fairToScore(scoreable),
     startInt(startInterval),
     baseInterval(startInt),
     screen(s),
-    sPressed(fastDropInitiated) {
+    sPressed(fastDropInitiated)
+{
 	quit = false;
 	mutex = SDL_CreateMutex();
 }
@@ -237,6 +240,12 @@ int Events::menu() {
 					screen->menu(names, scores);
 					break;
 				}
+                case SDLK_u :
+                {
+                    globalScoreList();
+                    screen->menu(names, scores);
+                    break;
+                }
 			/*	case SDLK_ESCAPE : {
 					quit = true;
 					break;
@@ -494,5 +503,32 @@ bool Events::pause() {
 	return !quit;
 }
 
+int Events::globalScoreList()
+{
+    globalHs.updateData();
+	screen->gScorePanel(globalHs.names, globalHs.scores);
+    cout << "Updated" << endl;
+	int err = 0;
+		while(!quit && SDL_WaitEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT: {
+				quit = true;
+				break;
+			}
+			case SDL_KEYDOWN : {
+				switch (event.key.keysym.sym)
+				case SDLK_RETURN : {
+                    return err;
+					break;
+				}
+		    	case SDLK_ESCAPE : {
+                    return err;
+					break;
+				}
+			}
+			}
+		}
+	return err;
+}
 
 } /* namespace tet */

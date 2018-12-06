@@ -24,8 +24,8 @@ SqlConn::SqlConn(std::vector<ConfEntry>& config)
         }
     }
     if (connInfo.str().length() < 1) conn = PQconnectdb("");
-    std::cout << "Connecting with parameters ";
-    std::cout<< connInfo.str().substr(0, connInfo.str().length()-1).c_str()<<"!"<<std::endl;
+    //std::cout << "Connecting with parameters ";
+    //std::cout<< connInfo.str().substr(0, connInfo.str().length()-1).c_str()<<"!"<<std::endl;
     //Eww
     conn = PQconnectdb(connInfo.str().substr(0, connInfo.str().length()-1).c_str());
 
@@ -65,6 +65,9 @@ void SqlConn::topList(std::string names[10], int scores[10])
     for (int i = 0; i <PQntuples(result); i++)
     {
        names[i] = PQgetvalue(result, i, PQfnumber(result, "name"));
+
+       if (names[i].size() > 10) names[i] = names[i].substr(0, 10);
+
        if (PQfformat(result, PQfnumber(result, "score")) != 0)
        {
            std::cout << "Binary formatting is not supported for now" << std::endl;
@@ -86,7 +89,7 @@ bool SqlConn::getLowest(int& score)
     query << "SELECT score FROM " << tablename;
     query << " ORDER BY score DESC LIMIT 1;";
     result = PQexec(conn, query.str().c_str());
-    std::cout << query.str() << std::endl;
+    //std::cout << query.str() << std::endl;
     if (PQresultStatus(result) != PGRES_TUPLES_OK)
     {
         PQclear(result);
@@ -130,12 +133,12 @@ void SqlConn::pushList(std::string names[10], int scores[10])
     if (!checkConnection()) return;
     for (int i = 0; i < 10; i++)
     {
-        if (scores[i] >= lowestNow)
+        if (scores[i] > lowestNow)
         {
             char* sanitized = PQescapeLiteral(conn, names[i].c_str(), 10);
             std::stringstream query;
             query << basicS << (const char*)sanitized << ", " << scores[i] << ");";
-            std::cout << "Doing " << query.str() << std::endl;
+            //std::cout << "Doing " << query.str() << std::endl;
             PGresult *res = PQexec(conn, query.str().c_str());
             if (PQresultStatus(res) != PGRES_COMMAND_OK)
             {

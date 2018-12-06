@@ -26,6 +26,7 @@ public:
 	void printGrid();
 	void pause();
 	void menu(string names[10], int scores[10]);
+    void gScorePanel(string names[10], int scores[10]);
 	void gameOver(string text);
 
 	Screen(int h, int w, Grid *g);
@@ -37,7 +38,7 @@ private:
 	bool isDestroyed;
 	void refresh();
 	void printHelp(SDL_Rect rect);
-	void printHS(SDL_Rect hsArea,string names[10], int scores[10]);
+	void printHS(SDL_Rect hsArea,string names[10], int scores[10], const char* header);
 	void setPixel(int x, int y, int r, int g, int b);
 	int topLeft[2]; // (y, x)
 	int bottomRight[2];

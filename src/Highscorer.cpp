@@ -21,12 +21,12 @@ using namespace std;
 using namespace rapidjson;
 namespace tet {
 
-Highscorer::Highscorer() {
+Highscorer::Highscorer(const char* hs_filename): hsFilename(hs_filename) {
 	for (int i = 0; i < 10; i++) {
 		currentScore[i] = 0;
 	}
 	Document scoreBoard;
-	if (!fileExists(".hs.json")) setFile(prototype);
+	if (!fileExists(hsFilename)) setFile(prototype);
 	else {
 		try {
 			string t = readFile();
@@ -118,11 +118,20 @@ bool Highscorer::addScore(std::string name, int score) {
 	}
 	return false;
 }
+void Highscorer::replaceList(std::string names[10], int scores[10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        currentBoard[i] = names[i];
+        currentScore[i] = scores[i];
+    }
+    refreshFile();
+}
 
 
 void Highscorer::refreshFile() {
 	Document scoreBoard;
-	if (!fileExists(".hs.json")) setFile(prototype);
+	if (!fileExists(hsFilename)) setFile(prototype);
 	else {
 		scoreBoard.Parse(readFile().c_str());
 		if (!validate(&scoreBoard)) setFile(prototype);
@@ -199,8 +208,9 @@ std::string decrypt(std::string const& msg, std::string const& key)
 
 
 void Highscorer::setFile(string t) {
-	remove (".hs.json");
-	ofstream out(".hs.json");
+    cout << "Creating encrypted highscore file" << hsFilename << endl;
+	remove (hsFilename);
+	ofstream out(hsFilename);
 	string enc = encrypt(t, key);
 	out << enc;
 	out.close();
@@ -208,7 +218,7 @@ void Highscorer::setFile(string t) {
 
 
 string Highscorer::readFile() {
-	file = fopen(".hs.json", "rb");
+	file = fopen(hsFilename, "rb");
 	stringstream s;
 	char c;
 	do {

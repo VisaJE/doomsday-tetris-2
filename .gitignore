@@ -2,14 +2,12 @@
 Debug
 DoomsdayTetris2
 DoomsdayTetris2.exe
-.server_config.json
+*.json
 SDL2.dll
 SDL2_ttf.dll
 zlib1.dll
 libfreetype-6.dll
 arial.ttf
-config.json
-.hs.json
 .cproject
 .vimrc
 obj/
