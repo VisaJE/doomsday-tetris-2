@@ -51,34 +51,100 @@ void SqlConn::exit(PGconn *conn)
 
 void SqlConn::topList(std::string names[10], int scores[10])
 {
-    if (PQstatus(conn) != CONNECTION_OK)
-    {
-        connectionStatus = connFAIL;
-        return;
-    }
+    if (!checkConnection()) return;
     std::stringstream query;
     query << "SELECT name, score FROM "<< tablename;
-    query << " ORDER BY score DESC LIMIT 10";
+    query << " ORDER BY score DESC LIMIT 10;";
     result = PQexec(conn, query.str().c_str());
     if (PQresultStatus(result) != PGRES_TUPLES_OK)
     {
+        PQclear(result);
         std::cout << "Receiving data failed" << std::endl;
         return;
     }
-    if (PQnfields(result) != 2) throw "Invalid columns";
-    for (int i = 0; i < std::min(10,PQntuples(result)); i++)
+    for (int i = 0; i <PQntuples(result); i++)
     {
        names[i] = PQgetvalue(result, i, PQfnumber(result, "name"));
-       char* scoreChar = PQgetvalue(result, i, PQfnumber(result, "score"));
-       int res = 0;
-       int offset= -1;
-       while (scoreChar[++offset] != 0)
+       if (PQfformat(result, PQfnumber(result, "score")) != 0)
        {
-            std::cout << scoreChar[offset] << "," << std::endl;
-            res += (offset+1)*10*(scoreChar[offset]-'0');
+           std::cout << "Binary formatting is not supported for now" << std::endl;
+           break;;
        }
-       scores[i] = res;
+       char* scoreChar = PQgetvalue(result, i, PQfnumber(result, "score"));
+       scores[i] = atoi(scoreChar);
     }
     PQclear(result);
+}
+
+/* Finds the lowest score that should be pushed, not the lowest
+ * score on server
+ */
+bool SqlConn::getLowest(int& score)
+{
+    if (!checkConnection()) return false;
+    std::stringstream query;
+    query << "SELECT score FROM " << tablename;
+    query << " ORDER BY score DESC LIMIT 1;";
+    result = PQexec(conn, query.str().c_str());
+    std::cout << query.str() << std::endl;
+    if (PQresultStatus(result) != PGRES_TUPLES_OK)
+    {
+        PQclear(result);
+        std::cout << "Receiving lowest data failed" << std::endl;
+        return false;
+    }
+    if (PQntuples(result) < 1)
+    {
+        score = 0;
+        PQclear(result);
+        return true;
+    }
+    auto scoreChar = PQgetvalue(result, 0, PQfnumber(result, "score"));
+    score = atoi(scoreChar);
+    PQclear(result);
+    return true;
+}
+bool SqlConn::checkConnection()
+{
+
+    if (PQstatus(conn) != CONNECTION_OK)
+    {
+        connectionStatus = connFAIL;
+        return false;
+    }
+    return true;
+}
+
+/*
+ * Pushes names and scores if the corresponding scores are higher than
+ * highest found on server.
+ */
+void SqlConn::pushList(std::string names[10], int scores[10])
+{
+    int lowestNow;
+    if (!getLowest(lowestNow)) {
+        return;
+    }
+    std::string basicS = "INSERT INTO " + tablename +
+        " (name, score) VALUES (";
+    if (!checkConnection()) return;
+    for (int i = 0; i < 10; i++)
+    {
+        if (scores[i] >= lowestNow)
+        {
+            char* sanitized = PQescapeLiteral(conn, names[i].c_str(), 10);
+            std::stringstream query;
+            query << basicS << (const char*)sanitized << ", " << scores[i] << ");";
+            std::cout << "Doing " << query.str() << std::endl;
+            PGresult *res = PQexec(conn, query.str().c_str());
+            if (PQresultStatus(res) != PGRES_COMMAND_OK)
+            {
+                std::cout << "Insertion failed" << std::endl;
+                std::cout << PQresStatus(PQresultStatus(res)) << std::endl;
+            }
+            PQfreemem(sanitized);
+            PQclear(res);
+        }
+    }
 }
 
