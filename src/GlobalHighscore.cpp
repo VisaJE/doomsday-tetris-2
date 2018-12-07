@@ -13,12 +13,10 @@ GlobalHighscore::GlobalHighscore(Highscorer *context): context(context)
 bool GlobalHighscore::updateData()
 {
     Highscorer ghs = Highscorer(".ghs.json");
-    std::cout << "Created a new highscorer" << std::endl;
     configuration = WebConf();
     configuration.initiate();
     if (!configuration.serviceEnabled)
     {
-        std::cout << "Online highscore service not enabled" << std::endl;
         names[0] = "Online";
         names[1] = "Services";
         names[2] = "Are turned";

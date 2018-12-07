@@ -509,7 +509,6 @@ int Events::globalScoreList()
 {
     globalHs.updateData();
 	screen->gScorePanel(globalHs.names, globalHs.scores);
-    cout << "Updated" << endl;
 	int err = 0;
 		while(!quit && SDL_WaitEvent(&event)) {
 			switch (event.type) {

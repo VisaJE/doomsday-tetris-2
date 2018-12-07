@@ -32,7 +32,6 @@ WebConf::~WebConf()
 bool WebConf::readConf()
 {
     FILE* conf =fopen(CONFIG_NAME, "rb");
-    std::cout << "Reading config" << std::endl;
     if (!conf) {
         return false;
     }
@@ -41,7 +40,6 @@ bool WebConf::readConf()
     FileReadStream in(conf, readBuffer, sizeof(readBuffer));
     doc.ParseStream(in);
     fclose(conf);
-    std::cout << "Gonna check validity" << std::endl;
     if (checkValidity(&doc)) setConf(&doc);
     else
     {
@@ -63,7 +61,6 @@ bool WebConf::checkValidity(Document *doc)
 
 void WebConf::setConf(Document *doc)
 {
-    std::cout << "Setting from the config file" << std::endl;
     serviceEnabled= doc->FindMember("enabled")->value.GetBool();
     for (const char* i : keys)
     {

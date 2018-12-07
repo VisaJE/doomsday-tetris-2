@@ -242,7 +242,6 @@ void Screen::gScorePanel(string names[10], int scores[10])
 	hsArea.y = topLeft[0] + boxSize*5 +  45;
 	hsArea.w = bottomRight[1]-45 - hsArea.x;
 	hsArea.h = textArea.y - hsArea.y;
-    cout << "Printing global highscore area" << endl;
 	printHS(hsArea, names, scores, "GLOBAL LEADERS");
 	SDL_RenderPresent(renderer);
 }
