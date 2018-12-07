@@ -49,6 +49,16 @@ void SqlConn::exit(PGconn *conn)
     connectionStatus = connDISCONNECTED;
 }
 
+void trimTrailingWhitespace(std::string *s)
+{
+   size_t len = s->length();
+   while (s->at(len-1) == ' ')
+   {
+       --len;
+   }
+   *s = s->substr(0, len);
+}
+
 void SqlConn::topList(std::string names[10], int scores[10])
 {
     if (!checkConnection()) return;
@@ -66,6 +76,7 @@ void SqlConn::topList(std::string names[10], int scores[10])
     {
        names[i] = PQgetvalue(result, i, PQfnumber(result, "name"));
 
+       trimTrailingWhitespace(&names[i]);
        if (names[i].size() > 10) names[i] = names[i].substr(0, 10);
 
        if (PQfformat(result, PQfnumber(result, "score")) != 0)
