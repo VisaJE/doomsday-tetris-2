@@ -247,10 +247,10 @@ int Events::menu() {
             screen->menu(names, scores);
             break;
           }
-        /*	case SDLK_ESCAPE : {
+    	case SDLK_q: {
             quit = true;
             break;
-          }*/
+          }
         }
 			}
 			}
@@ -266,12 +266,12 @@ int Events::init() {
 	SDL_TimerID timer = SDL_AddTimer(startInt, &ticker, this);
 	SDL_TimerID slideRTimer = SDL_AddTimer(startInt, &voidFunc, this);
 	SDL_TimerID slideLTimer = SDL_AddTimer(startInt, &voidFunc, this);
+    //This is done to remove a warning of non initialized timers.
     SDL_RemoveTimer(slideLTimer);
-    SDL_RemoveTimer(slideRTimer); //This is done to remove a warning of non initialized timers.
-	aPressed = false;
+    SDL_RemoveTimer(slideRTimer); 	
+    aPressed = false;
 	sPressed = false;
 	dPressed = false;
-//	g.printGrid();
 	screen->printGrid();
 	while (!quit) {
 		while(SDL_PollEvent(&event)) {
@@ -355,7 +355,6 @@ int Events::init() {
 							if (pause()) {
 								timer = SDL_AddTimer(currentInterval, &ticker, this);
 								g->wholeTick();
-//								g.printGrid();
 								screen->printGrid();
 							}
 							break;
@@ -375,7 +374,6 @@ int Events::init() {
 							SDL_UnlockMutex(mutex);
 							g->reset();
 							timer = SDL_AddTimer(startInt, &ticker, this);
-//							g.printGrid();
 							screen->printGrid();
 							} catch (int i) {}
                             speedUpdated = false;
