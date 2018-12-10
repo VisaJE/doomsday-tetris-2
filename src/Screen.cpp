@@ -84,9 +84,9 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 
 
 
-	font = TTF_OpenFont("arial.ttf", 30);
-	textFont = TTF_OpenFont("arial.ttf", boxSize/3.0);
-	scoreFont = TTF_OpenFont("arial.ttf", boxSize/1.7);
+	font = TTF_OpenFont("font.ttf", 30);
+	textFont = TTF_OpenFont("font.ttf", boxSize/3.0);
+	scoreFont = TTF_OpenFont("font.ttf", boxSize/1.7);
 
 	if (font == NULL && textFont == NULL) {
 		cout << "Font not found" << endl;

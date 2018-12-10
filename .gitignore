@@ -8,7 +8,7 @@ SDL2_ttf.dll
 zlib1.dll
 libfreetype-6.dll
 Makefile
-arial.ttf
+*.ttf
 .cproject
 .vimrc
 obj/

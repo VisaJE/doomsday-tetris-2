@@ -7,7 +7,7 @@
 ## Dependencies
 * SDL2 library
 * SDL_TTF, which also comes with it own dependencies.
-* Some font which should be named arial.ttf in the source folder.
+* Some font which should be named font.ttf in the source folder.
 * Rapidjson
 
 ## Configuring
@@ -16,3 +16,9 @@
 * Some changes in the configuration prevent ones score to be counted to the leaderboard. This is merely to preserve fair game.
 * Sliding speed has to be at least 1. At that speed the block moves sideways once per one tick.
 * The default grid/board that also gets scored is 10x19.
+
+## Online leaderboard
+* The game now comes with a possibility to connect to an postgresql server to fetch highscore data. The table should have following columns: name: char[10] or varchar[10] NOT NULL, sore
+int. Also sql tends to require a unique identifier.
+* The configuration file is created on launching the game and read on every launch.
+
