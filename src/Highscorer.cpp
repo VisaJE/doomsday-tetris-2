@@ -208,7 +208,7 @@ std::string decrypt(std::string const& msg, std::string const& key)
 
 
 void Highscorer::setFile(string t) {
-    cout << "Creating encrypted highscore file" << hsFilename << endl;
+    //cout << "Creating encrypted highscore file" << hsFilename << endl;
 	remove (hsFilename);
 	ofstream out(hsFilename);
 	string enc = encrypt(t, key);
