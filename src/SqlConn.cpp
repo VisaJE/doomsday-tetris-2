@@ -91,14 +91,14 @@ void SqlConn::topList(std::string names[10], int scores[10])
 }
 
 /* Finds the lowest score that should be pushed, not the lowest
- * score on server
+ * score on server, but the 10th lowest!
  */
 bool SqlConn::getLowest(int& score)
 {
     if (!checkConnection()) return false;
     std::stringstream query;
     query << "SELECT score FROM " << tablename;
-    query << " ORDER BY score DESC LIMIT 1;";
+    query << " ORDER BY score DESC LIMIT 10;";
     result = PQexec(conn, query.str().c_str());
     //std::cout << query.str() << std::endl;
     if (PQresultStatus(result) != PGRES_TUPLES_OK)
@@ -107,13 +107,14 @@ bool SqlConn::getLowest(int& score)
         std::cout << "Receiving lowest data failed" << std::endl;
         return false;
     }
-    if (PQntuples(result) < 1)
+    if (PQntuples(result) < 10)
     {
         score = 0;
         PQclear(result);
         return true;
     }
-    auto scoreChar = PQgetvalue(result, 0, PQfnumber(result, "score"));
+    auto scoreChar = PQgetvalue(result, PQntuples(result)-1,
+           PQfnumber(result, "score"));
     score = atoi(scoreChar);
     PQclear(result);
     return true;
@@ -139,6 +140,7 @@ void SqlConn::pushList(std::string names[10], int scores[10])
     if (!getLowest(lowestNow)) {
         return;
     }
+    //std::cout << "Going to print scores higher than "  << lowestNow << std::endl;
     std::string basicS = "INSERT INTO " + tablename +
         " (name, score) VALUES (";
     if (!checkConnection()) return;
