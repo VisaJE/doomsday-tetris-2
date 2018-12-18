@@ -228,14 +228,14 @@ bool Highscorer::fileExists(const std::string& filename)
 
 std::string encrypt(std::string msg, std::string const& key)
 {
-//    // Side effects if the following is not written:
-//    // In my case, division by 0.
-//    // In the other case, stuck in an infinite loop.
-//    if(!key.size())
-//        return msg;
-//
-//    for (std::string::size_type i = 0; i < msg.size(); ++i)
-//        msg[i] ^= key[i%key.size()];
+    // Side effects if the following is not written:
+    // In my case, division by 0.
+    // In the other case, stuck in an infinite loop.
+    if(!key.size())
+        return msg;
+
+    for (std::string::size_type i = 0; i < msg.size(); ++i)
+        msg[i] ^= key[i%key.size()];
     return msg;
 }
 
