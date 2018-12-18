@@ -4,6 +4,7 @@
 #include "WebConf.h"
 #include <unistd.h>
 #include "Highscorer.h"
+#include "UniqueIdentifier.h"
 
 using namespace tet;
 GlobalHighscore::GlobalHighscore(Highscorer *context): context(context)
@@ -30,8 +31,9 @@ bool GlobalHighscore::updateData()
     SqlConn connection = SqlConn(configuration.configuration);
     int tscores[10];
     std::string tnames[10];
-    context->getHighscore(tnames, tscores);
-    connection.pushList(tnames, tscores);
+    Uid ids[10];
+    context->getHighscore(tnames, tscores, ids);
+    connection.pushList(tnames, tscores, ids);
     connection.topList(names, scores);
     return true;
 }

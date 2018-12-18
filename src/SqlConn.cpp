@@ -3,6 +3,7 @@
 #include <libpq-fe.h>
 #include <sstream>
 #include <unistd.h>
+#include "UniqueIdentifier.h"
 
 using namespace tet;
 
@@ -90,9 +91,6 @@ void SqlConn::topList(std::string names[10], int scores[10])
     PQclear(result);
 }
 
-/* TODO: IMPLEMENT THIS IN SOME ELSE WAY. NOW PUSHES SAME VALUES MULTIPLE TIMES
- * NOW RETURNS THE HIGHEST VALUE
- */
 bool SqlConn::getLowest(int& score)
 {
     if (!checkConnection()) return false;
@@ -119,6 +117,35 @@ bool SqlConn::getLowest(int& score)
     PQclear(result);
     return true;
 }
+
+bool SqlConn::getIdList(Uid ids[10], int scores[10])
+{
+    if (!checkConnection()) return false;
+    std::stringstream query;
+    query << "SELECT uid, score FROM "<< tablename;
+    query << " ORDER BY score DESC LIMIT 10;";
+    result = PQexec(conn, query.str().c_str());
+    if (PQresultStatus(result) != PGRES_TUPLES_OK)
+    {
+        PQclear(result);
+        std::cout << "Receiving id data failed" << std::endl;
+        return false;
+    }
+    for (int i = 0; i <PQntuples(result); i++)
+    {
+       ids[i] = PQgetvalue(result, i, PQfnumber(result, "uid"));
+
+       if (PQfformat(result, PQfnumber(result, "score")) != 0)
+       {
+           std::cout << "Binary formatting is not supported for now" << std::endl;
+           break;;
+       }
+       char* scoreChar = PQgetvalue(result, i, PQfnumber(result, "score"));
+       scores[i] = atoi(scoreChar);
+    }
+    PQclear(result);
+    return true;
+}
 bool SqlConn::checkConnection()
 {
 
@@ -131,27 +158,42 @@ bool SqlConn::checkConnection()
 }
 
 /*
- * Pushes names and scores if the corresponding scores are higher than
- * highest found on server.
+ * Pushes names and scores if they will appear on the top 10.
  */
-void SqlConn::pushList(std::string names[10], int scores[10])
+void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
 {
-    int lowestNow;
-    if (!getLowest(lowestNow)) {
-        return;
-    }
-    //std::cout << "Going to print scores higher than "  << lowestNow << std::endl;
+    int onlScores[10];
+    Uid onlIds[10];
+    for (int i = 0; i < 10; i++) onlScores[i] = 0;
+    getIdList(onlIds, onlScores);
+    // std::cout << "Found: " << std::endl;
+    // for (int i = 0; i < 10; i++) std::cout << onlIds[i] << ", " << onlScores[i] << std::endl;
     std::string basicS = "INSERT INTO " + tablename +
-        " (name, score) VALUES (";
+        " (name, score, uid) VALUES (";
     if (!checkConnection()) return;
-    for (int i = 0; i < 10; i++)
+    int idCollisions = 0;
+    int inserted = 0;
+    int LastLocal = 0;
+    while(scores[LastLocal] >0) LastLocal++;
+    for (int local = 0; local < LastLocal; local++)
     {
-        if (scores[i] > lowestNow)
+        for (int online = local - idCollisions-inserted; online < 10-inserted; online++)
         {
-            char* sanitized = PQescapeLiteral(conn, names[i].c_str(), 10);
+        if (UniqueIdentifier::compare(ids[local], onlIds[online]))
+        {
+            idCollisions++;
+            online = 10;
+        }
+        else if (scores[local] > onlScores[online])
+        {
+            ++inserted;
+            char* sanitized = PQescapeLiteral(conn, names[local].c_str(), 10);
+
+            char* sanId = PQescapeLiteral(conn, ids[local].c_str(), 10);
+
             std::stringstream query;
-            query << basicS << (const char*)sanitized << ", " << scores[i] << ");";
-            //std::cout << "Doing " << query.str() << std::endl;
+            query << basicS << (const char*)sanitized << ", " << scores[local] << ", ";
+            query << (const char*) sanId << ");";
             PGresult *res = PQexec(conn, query.str().c_str());
             if (PQresultStatus(res) != PGRES_COMMAND_OK)
             {
@@ -159,7 +201,10 @@ void SqlConn::pushList(std::string names[10], int scores[10])
                 std::cout << PQresStatus(PQresultStatus(res)) << std::endl;
             }
             PQfreemem(sanitized);
+            PQfreemem(sanId);
             PQclear(res);
+            online = 10;
+        }
         }
     }
 }

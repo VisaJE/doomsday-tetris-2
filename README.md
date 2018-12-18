@@ -19,6 +19,6 @@
 
 ## Online leaderboard
 * The game now comes with a possibility to connect to an postgresql server to fetch highscore data. The table should have following columns: name: char[10] or varchar[10] NOT NULL, sore
-int. Also sql tends to require a unique identifier.
+int and uid: char[10], which may be used as the unique identifier.
 * The configuration file is created on launching the game and read on every launch.
 
