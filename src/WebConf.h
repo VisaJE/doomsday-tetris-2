@@ -25,13 +25,15 @@ private:
     bool checkValidity(rapidjson::Document *doc);
     void setConf(rapidjson::Document *doc);
     void makeConf();
-    const char* keys[7] = {
+    const char* keys[8] = {
                 "dbname",
                 "port",
                 "hostaddr",
                 "host",
                 "user",
                 "password",
-                "table"};
+                "table",
+                "connection_timeout"
+                };
 };
 }

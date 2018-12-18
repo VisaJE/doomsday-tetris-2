@@ -17,6 +17,7 @@
 #include <fstream>
 #include <vector>
 #include <climits>
+#include "UniqueIdentifier.h"
 using namespace std;
 using namespace rapidjson;
 namespace tet {
@@ -57,7 +58,16 @@ void Highscorer::getHighscore(string name[10], int score[10]) {
 			score[i] = currentScore[i];
 	}
 	sort(name, score);
+}
 
+
+void Highscorer::getHighscore(string name[10], int score[10], Uid id[10]) {
+	for (int i = 0; i < 10; i++) {
+			name[i] = currentBoard[i];
+			score[i] = currentScore[i];
+            id[i] = currentId[i];
+	}
+	sort(name, score, id);
 }
 
 int Highscorer::getHighest() {
@@ -71,7 +81,7 @@ int Highscorer::getLowest() {
 	for (int i = 0; i < 10; i++) if (currentScore[i] < lowest) lowest = currentScore[i];
 	return lowest;
 }
-void Highscorer::sort(string name[10], int score[10]) {
+void Highscorer::sort(string name[10], int score[10]){
 	int i = 0;
 	while (i < 8) {
 		while (score[i+1] <= score[i] && i < 9) {
@@ -80,6 +90,26 @@ void Highscorer::sort(string name[10], int score[10]) {
 		if (i < 9 && score[i+1] > score[i]) {
 			string tempn = name[i];
 			int temps = score[i];
+			name[i] = name[i+1];
+			score[i] = score[i+1];
+			name[i+1] = tempn;
+			score[i+1] = temps;
+			i = 0;
+		}
+	}
+}
+void Highscorer::sort(string name[10], int score[10], Uid ids[10]) {
+	int i = 0;
+	while (i < 8) {
+		while (score[i+1] <= score[i] && i < 9) {
+			++i;
+		}
+		if (i < 9 && score[i+1] > score[i]) {
+			string tempn = name[i];
+			int temps = score[i];
+            Uid tempu = ids[i];
+            ids[i] = ids[i+1];
+            ids[i+1] = tempu;
 			name[i] = name[i+1];
 			score[i] = score[i+1];
 			name[i+1] = tempn;
@@ -98,6 +128,9 @@ bool Highscorer::addScore(std::string name, int score) {
 	if (putHere != -1) {
 		currentScore[putHere] = score;
 		currentBoard[putHere] = name;
+        Uid uid = UniqueIdentifier::getUid(name);
+        //cout << "Made an uid" << uid << endl;
+        currentId[putHere] = uid;
 		refreshFile();
 		return true;
 	}
@@ -112,18 +145,22 @@ bool Highscorer::addScore(std::string name, int score) {
 		if (putHere != -1) {
 			currentScore[putHere] = score;
 			currentBoard[putHere] = name;
-			refreshFile();
-			return true;
+            Uid uid = UniqueIdentifier::getUid(name);
+            cout << "Made an uid" << uid << endl;
+            currentId[putHere] = uid;
+	 		refreshFile();
+	 		return true;
 		}
 	}
 	return false;
 }
-void Highscorer::replaceList(std::string names[10], int scores[10])
+void Highscorer::replaceList(std::string names[10], int scores[10], Uid ids[10])
 {
     for (int i = 0; i < 10; i++)
     {
         currentBoard[i] = names[i];
         currentScore[i] = scores[i];
+        currentId[i] = ids[i];
     }
     refreshFile();
 }
@@ -140,10 +177,13 @@ void Highscorer::refreshFile() {
 
 	Value::MemberIterator names = scoreBoard.FindMember("name");
 	Value::MemberIterator scores = scoreBoard.FindMember("score");
+    auto ids = scoreBoard.FindMember("uid");
 	for (int i = 0; i < 10; i++) {
 		const char* thisname = currentBoard[i].c_str();
 		names->value[i] = StringRef(thisname);
 		scores->value[i] = currentScore[i];
+        const char* thisId = currentId[i].c_str();
+        ids->value[i] = StringRef(thisId);
 	}
 	rapidjson::StringBuffer buffer;
 	buffer.Clear();
@@ -158,11 +198,14 @@ void Highscorer::updateLists(Document *d) {
 	for (int i = 0; i < 10; i++) {
 		currentBoard[i] = "";
 		currentScore[i] = 0;
+        currentId[i] = "";
 		Value::MemberIterator names = d->FindMember("name");
 		Value::MemberIterator scores = d->FindMember("score");
+        Value::MemberIterator ids = d->FindMember("uid");
 		if (names->value[i].IsString()) {
 			currentBoard[i] = names->value[i].GetString();
 			currentScore[i] = scores->value[i].GetInt();
+            currentId[i] = ids->value[i].GetString();
 		}
 	}
 }
@@ -180,11 +223,7 @@ void Highscorer::updateLists(Document *d) {
 bool Highscorer::fileExists(const std::string& filename)
 {
     struct stat buf;
-    if (stat(filename.c_str(), &buf) != -1)
-    {
-        return true;
-    }
-    return false;
+    return stat(filename.c_str(), &buf) != -1;
 }
 
 std::string encrypt(std::string msg, std::string const& key)
@@ -250,7 +289,13 @@ bool Highscorer::validate(Document *d) {
 	for (int i = 0; i < 10; i++) {
 		if (!(here->value[i].IsNumber())) valid = false;
 	}
-	return valid;
+    here = d->FindMember("uid");
+    if (here == d->MemberEnd()) valid = false;
+    else if (!(here->value.IsArray())) valid = false;
+	for (int i = 0; i < 10; i++) {
+		if (!(here->value[i].IsString())) valid = false;
+	}
+    return valid;
 }
 
 } /* namespace tet */

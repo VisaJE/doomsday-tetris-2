@@ -12,7 +12,7 @@ GlobalHighscore::GlobalHighscore(Highscorer *context): context(context)
 
 bool GlobalHighscore::updateData()
 {
-    Highscorer ghs = Highscorer(".ghs.json");
+    // Highscorer ghs = Highscorer(".ghs.json");
     configuration = WebConf();
     configuration.initiate();
     if (!configuration.serviceEnabled)
