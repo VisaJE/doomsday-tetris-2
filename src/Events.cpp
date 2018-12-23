@@ -219,42 +219,72 @@ int Events::menu() {
 	hs.getHighscore(names, scores);
 	screen->menu(names, scores);
 	int err = 0;
-		while(!quit && SDL_WaitEvent(&event)) {
-			switch (event.type) {
-			case SDL_QUIT: {
-				quit = true;
-				break;
-			}
-			case SDL_KEYDOWN : {
-				switch (event.key.keysym.sym)
-        {
-          case SDLK_RETURN : {
-            err = init();
-            if (g->lost && err == 0) {
-              err = setHighscore();
-              g->reset();
-              while (callQue.size()!=0){
-                callQue.pop();
-              }
+    bool sizeCh = false;
+    while(!quit && SDL_WaitEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT: {
+            	quit = true;
+            	break;
             }
-            hs.getHighscore(names, scores);
-            screen->menu(names, scores);
-            break;
-          }
-          case SDLK_g :
-          {
-            globalScoreList();
-            screen->menu(names, scores);
-            break;
-          }
-    	case SDLK_q: {
-            quit = true;
-            break;
-          }
+            case SDL_WINDOWEVENT :
+            {
+                switch (event.window.event)
+                {
+                case SDL_WINDOWEVENT_RESIZED:
+                    {
+                    if (sizeCh)
+                    {
+                    if (event.window.windowID == screen->windowID)
+                    {
+                        auto w = event.window.data1;
+                        auto h = event.window.data2;
+                        screen->changeSize(h, w);
+                        screen->menu(names, scores);
+                    }
+                    sizeCh = false;
+                    }
+                    break;
+                    }
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    {
+                    sizeCh = true;
+                    break;
+                    }
+                }
+                break;
+            }
+            case SDL_KEYDOWN : {
+            	switch (event.key.keysym.sym)
+                {
+                case SDLK_RETURN :
+                {
+                  err = init();
+                  if (g->lost && err == 0) {
+                    err = setHighscore();
+                    g->reset();
+                    while (callQue.size()!=0){
+                      callQue.pop();
+                    }
+                  }
+                  hs.getHighscore(names, scores);
+                  screen->menu(names, scores);
+                  break;
+                }
+                case SDLK_g :
+                {
+                  globalScoreList();
+                  screen->menu(names, scores);
+                  break;
+                }
+                case SDLK_q:
+                {
+                    quit = true;
+                    break;
+                }
+                }
+            }
         }
-			}
-			}
-		}
+    }
 	return err;
 }
 
@@ -268,7 +298,7 @@ int Events::init() {
 	SDL_TimerID slideLTimer = SDL_AddTimer(startInt, &voidFunc, this);
     //This is done to remove a warning of non initialized timers.
     SDL_RemoveTimer(slideLTimer);
-    SDL_RemoveTimer(slideRTimer); 	
+    SDL_RemoveTimer(slideRTimer);
     aPressed = false;
 	sPressed = false;
 	dPressed = false;

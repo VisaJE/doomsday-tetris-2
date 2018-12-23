@@ -28,7 +28,8 @@ public:
 	void menu(string names[10], int scores[10]);
     void gScorePanel(string names[10], int scores[10]);
 	void gameOver(string text);
-
+    void changeSize(int h, int w);
+    Uint32 windowID;
 	Screen(int h, int w, Grid *g);
 	virtual ~Screen();
 private:
@@ -36,6 +37,9 @@ private:
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
 	bool isDestroyed;
+    void setSizes();
+    void setFonts();
+    void setTexture();
 	void refresh();
 	void printHelp(SDL_Rect rect);
 	void printHS(SDL_Rect hsArea,string names[10], int scores[10], const char* header);
