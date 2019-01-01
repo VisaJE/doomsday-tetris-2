@@ -259,6 +259,11 @@ int Events::menu() {
                 break;
             }
             case SDL_KEYDOWN : {
+                if (sizeCh)
+                {
+                    screen->changeSize(height, width);
+                    screen->menu(names, scores);
+                }
             	switch (event.key.keysym.sym)
                 {
                 case SDLK_RETURN :
