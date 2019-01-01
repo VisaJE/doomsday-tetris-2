@@ -22,7 +22,6 @@ public:
 	int SCREEN_WIDTH;
 	Grid *GRID;
 	void destroy();
-	void start();
 	void printGrid();
 	void pause();
 	void menu(string names[10], int scores[10]);

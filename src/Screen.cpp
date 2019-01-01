@@ -192,6 +192,7 @@ void Screen::printHelp(SDL_Rect rect) {
 
 
 void Screen::menu(string names[10], int scores[10]) {
+    SDL_SetWindowResizable(window, SDL_TRUE);
 	SDL_Rect textArea;
 	textArea.x = topLeft[1] + 45;
 	textArea.y = bottomRight[0] - boxSize*3.6;
@@ -393,6 +394,7 @@ void Screen::setPixel(int y, int x, int r, int g, int b) {
 }
 
 void Screen::printGrid() {
+    SDL_SetWindowResizable(window, SDL_FALSE);
 	for (int h = 0; h < GRID->height; h++) {
 		for (int w = 0; w < GRID->width; w++) {
 			if (GRID->isThere(h, w)) {
