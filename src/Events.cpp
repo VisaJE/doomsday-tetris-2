@@ -220,11 +220,22 @@ int Events::menu() {
 	screen->menu(names, scores);
 	int err = 0;
     bool sizeCh = false;
+    int width = 0;
+    int height = 0;
     while(!quit && SDL_WaitEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT: {
             	quit = true;
             	break;
+            }
+            case SDL_MOUSEBUTTONUP:
+            {
+                if (sizeCh)
+                {
+                    screen->changeSize(height, width);
+                    screen->menu(names, scores);
+                }
+                break;
             }
             case SDL_WINDOWEVENT :
             {
@@ -232,16 +243,10 @@ int Events::menu() {
                 {
                 case SDL_WINDOWEVENT_RESIZED:
                     {
-                    if (sizeCh)
-                    {
                     if (event.window.windowID == screen->windowID)
                     {
-                        auto w = event.window.data1;
-                        auto h = event.window.data2;
-                        screen->changeSize(h, w);
-                        screen->menu(names, scores);
-                    }
-                    sizeCh = false;
+                        width = event.window.data1;
+                        height = event.window.data2;
                     }
                     break;
                     }
