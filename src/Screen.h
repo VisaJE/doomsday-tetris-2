@@ -32,13 +32,13 @@ public:
 	Screen(int h, int w, Grid *g);
 	virtual ~Screen();
 private:
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	SDL_Texture *texture;
+	SDL_Window *window=NULL;
+	SDL_Renderer *renderer=NULL;
+	SDL_Texture *texture=NULL;
 	bool isDestroyed;
-    void setSizes();
-    void setFonts();
-    void setTexture();
+  void setSizes();
+  void setFonts();
+  void setTexture();
 	void refresh();
 	void printHelp(SDL_Rect rect);
 	void printHS(SDL_Rect hsArea,string names[10], int scores[10], const char* header);
@@ -48,9 +48,9 @@ private:
 	int boxSize;
 	BoxTexture boxTexture;
 	std::vector<Uint32> buffer;
-	TTF_Font* font;
-	TTF_Font* textFont;
-	TTF_Font* scoreFont;
+	TTF_Font* font=NULL;
+	TTF_Font* textFont=NULL;
+	TTF_Font* scoreFont=NULL;
 	SDL_Color textColor;
 	SDL_Rect infoRect;
 	bool horizontal;

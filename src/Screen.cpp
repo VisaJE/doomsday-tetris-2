@@ -27,9 +27,9 @@ void Screen::setSizes()
 	bottomRight[0] = SCREEN_HEIGHT-1;
 	bottomRight[1] = SCREEN_WIDTH-1;
 	int hLim = (bottomRight[0]-topLeft[0])/GRID->height;
-    int hLimRed = (SCREEN_WIDTH-topLeft[1]-135)/GRID->width;
+  int hLimRed = (SCREEN_WIDTH-topLeft[1]-135)/GRID->width;
 	int wLim = (bottomRight[1]-topLeft[1])/GRID->width;
-    int wLimRed = (SCREEN_HEIGHT-topLeft[0]-70)/GRID->height;
+  int wLimRed = (SCREEN_HEIGHT-topLeft[0]-70)/GRID->height;
 	// Setting the parameters based on the limiting dimension.
 	if (wLimRed < hLimRed) {
 		boxSize = hLim;
@@ -67,15 +67,16 @@ void Screen::setSizes()
 		infoRect.h = SCREEN_HEIGHT;
 	}
 	boxTexture = BoxTexture(boxSize);
-    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+  
+  SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 
 Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g) {
 	TTF_Init();
-    setSizes();
+
 	isDestroyed = false;
-    Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
+  Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
 	window = SDL_CreateWindow("DoomsdayTetris-2",
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
 	if (window==NULL)  {
@@ -84,7 +85,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 		throw 10;
 	}
 
-    windowID = SDL_GetWindowID(window);
+  windowID = SDL_GetWindowID(window);
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) {
@@ -92,21 +93,19 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
 		destroy();
 		throw 11;
 	}
-
-    setTexture();
-
-    setFonts();
+  setSizes();
+  setTexture();
+  setFonts();
 
 	textColor = {200, 200, 200};
-
 	refresh();
 }
 void Screen::setFonts()
 {
-    if (font != NULL) TTF_CloseFont(font);
-    if (textFont != NULL) TTF_CloseFont(textFont);
-    if (scoreFont != NULL) TTF_CloseFont(scoreFont);
-    font = TTF_OpenFont("font.ttf", 30);
+  if (font != NULL) TTF_CloseFont(font);
+  if (textFont != NULL) TTF_CloseFont(textFont);
+  if (scoreFont != NULL) TTF_CloseFont(scoreFont);
+  font = TTF_OpenFont("font.ttf", 30);
 	textFont = TTF_OpenFont("font.ttf", boxSize/3.0);
 	scoreFont = TTF_OpenFont("font.ttf", boxSize/1.7);
 
@@ -118,12 +117,12 @@ void Screen::setFonts()
 
 void Screen::setTexture()
 {
-    if (texture != NULL) SDL_DestroyTexture(texture);
+  if (texture != NULL) SDL_DestroyTexture(texture);
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (texture == NULL) {
-        cout << "Initializing texture failed" << endl;
-        throw 12;
-    }
+  if (texture == NULL) {
+      cout << "Initializing texture failed" << endl;
+      throw 12;
+  }
 	buffer = vector<Uint32>(SCREEN_WIDTH*SCREEN_HEIGHT, 0);
 	// To make the background prettier.
 	for (int y =0; y < SCREEN_HEIGHT; y++) {
@@ -131,7 +130,7 @@ void Screen::setTexture()
 			int whiteness = abs(sin(0.1*x)*sin(0.1*y))*50;
 			setPixel(y, x, whiteness, whiteness, 0.5*whiteness);
 		}
-    }
+  }
 }
 
 
