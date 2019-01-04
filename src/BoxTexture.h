@@ -13,13 +13,13 @@ namespace tet {
 
 class BoxTexture {
 public:
-	BoxTexture();
-	BoxTexture(int width);
-	virtual ~BoxTexture();
-	int getIntensity(int y,int x);
+    BoxTexture();
+    BoxTexture(int width);
+    virtual ~BoxTexture();
+    int getIntensity(int y,int x);
 private:
-	int width;
-	std::vector<int> buffer;
+    int width;
+    std::vector<int> buffer;
 };
 
 } /* namespace tet */

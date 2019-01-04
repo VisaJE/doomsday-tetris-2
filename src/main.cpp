@@ -22,34 +22,34 @@ using namespace tet;
 
 
 int main()  {
-	// Initialise SDL
+    // Initialise SDL
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
-		cout << "FAIL" << endl;
-		return 1;
-	}
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
+        cout << "FAIL" << endl;
+        return 1;
+    }
 
     //Lets test the glboal highscore system
     // Configuring
-	Conf conf = Conf();
-	const int boardHeight = conf.boardHeight;
-	const int boardWidth = conf.boardWidth;
-	int screenHeight = conf.screenHeight;
-	int screenWidth = conf.screenWidth;
+    Conf conf = Conf();
+    const int boardHeight = conf.boardHeight;
+    const int boardWidth = conf.boardWidth;
+    int screenHeight = conf.screenHeight;
+    int screenWidth = conf.screenWidth;
 
-	UberBlockifier blockGen(boardWidth);
-	StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
+    UberBlockifier blockGen(boardWidth);
+    StaticBlock b(vector<bool>(boardWidth*boardHeight, false), boardHeight, boardWidth);
     bool fastDropInitiated = false;
-	Grid gameGrid(b, blockGen, boardHeight, boardWidth, fastDropInitiated);
+    Grid gameGrid(b, blockGen, boardHeight, boardWidth, fastDropInitiated);
 
-	// Initialise
-	Screen screen(screenHeight, screenWidth, &gameGrid);
+    // Initialise
+    Screen screen(screenHeight, screenWidth, &gameGrid);
 
-	Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid(), fastDropInitiated);
-	eventHandler.menu();
+    Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid(), fastDropInitiated);
+    eventHandler.menu();
 
-	SDL_Quit();
-	return 0;
+    SDL_Quit();
+    return 0;
 }
 
 

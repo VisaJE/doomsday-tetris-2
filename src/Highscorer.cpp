@@ -23,28 +23,28 @@ using namespace rapidjson;
 namespace tet {
 
 Highscorer::Highscorer(const char* hs_filename): hsFilename(hs_filename) {
-	for (int i = 0; i < 10; i++) {
-		currentScore[i] = 0;
-	}
-	Document scoreBoard;
-	if (!fileExists(hsFilename)) setFile(prototype);
-	else {
-		try {
-			string t = readFile();
-			scoreBoard.Parse(t.c_str());
-			if (scoreBoard.HasParseError()) {
-				cout << "Parsing error. Leaderboard reset." << endl;
-				setFile(prototype);
-				readFile();
+    for (int i = 0; i < 10; i++) {
+        currentScore[i] = 0;
+    }
+    Document scoreBoard;
+    if (!fileExists(hsFilename)) setFile(prototype);
+    else {
+        try {
+            string t = readFile();
+            scoreBoard.Parse(t.c_str());
+            if (scoreBoard.HasParseError()) {
+                cout << "Parsing error. Leaderboard reset." << endl;
+                setFile(prototype);
+                readFile();
 
-			}
-			else if (validate(&scoreBoard)) {
-				updateLists(&scoreBoard);
-			} else {
-				setFile(prototype);
-			}
-		} catch (int i) { cout << "Failure in setting the leaderboard." << endl;}
-	}
+            }
+            else if (validate(&scoreBoard)) {
+                updateLists(&scoreBoard);
+            } else {
+                setFile(prototype);
+            }
+        } catch (int i) { cout << "Failure in setting the leaderboard." << endl;}
+    }
 
 }
 
@@ -53,106 +53,106 @@ Highscorer::~Highscorer() {
 
 
 void Highscorer::getHighscore(string name[10], int score[10]) {
-	for (int i = 0; i < 10; i++) {
-			name[i] = currentBoard[i];
-			score[i] = currentScore[i];
-	}
-	sort(name, score);
+    for (int i = 0; i < 10; i++) {
+            name[i] = currentBoard[i];
+            score[i] = currentScore[i];
+    }
+    sort(name, score);
 }
 
 
 void Highscorer::getHighscore(string name[10], int score[10], Uid id[10]) {
-	for (int i = 0; i < 10; i++) {
-			name[i] = currentBoard[i];
-			score[i] = currentScore[i];
+    for (int i = 0; i < 10; i++) {
+            name[i] = currentBoard[i];
+            score[i] = currentScore[i];
             id[i] = currentId[i];
-	}
-	sort(name, score, id);
+    }
+    sort(name, score, id);
 }
 
 int Highscorer::getHighest() {
-	int highest = 0;
-	for (int i = 0; i < 10; i++) if (currentScore[i] > highest) highest = currentScore[i];
-	return highest;
+    int highest = 0;
+    for (int i = 0; i < 10; i++) if (currentScore[i] > highest) highest = currentScore[i];
+    return highest;
 }
 
 int Highscorer::getLowest() {
-	int lowest = INT_MAX;
-	for (int i = 0; i < 10; i++) if (currentScore[i] < lowest) lowest = currentScore[i];
-	return lowest;
+    int lowest = INT_MAX;
+    for (int i = 0; i < 10; i++) if (currentScore[i] < lowest) lowest = currentScore[i];
+    return lowest;
 }
 void Highscorer::sort(string name[10], int score[10]){
-	int i = 0;
-	while (i < 8) {
-		while (score[i+1] <= score[i] && i < 9) {
-			++i;
-		}
-		if (i < 9 && score[i+1] > score[i]) {
-			string tempn = name[i];
-			int temps = score[i];
-			name[i] = name[i+1];
-			score[i] = score[i+1];
-			name[i+1] = tempn;
-			score[i+1] = temps;
-			i = 0;
-		}
-	}
+    int i = 0;
+    while (i < 8) {
+        while (score[i+1] <= score[i] && i < 9) {
+            ++i;
+        }
+        if (i < 9 && score[i+1] > score[i]) {
+            string tempn = name[i];
+            int temps = score[i];
+            name[i] = name[i+1];
+            score[i] = score[i+1];
+            name[i+1] = tempn;
+            score[i+1] = temps;
+            i = 0;
+        }
+    }
 }
 void Highscorer::sort(string name[10], int score[10], Uid ids[10]) {
-	int i = 0;
-	while (i < 8) {
-		while (score[i+1] <= score[i] && i < 9) {
-			++i;
-		}
-		if (i < 9 && score[i+1] > score[i]) {
-			string tempn = name[i];
-			int temps = score[i];
+    int i = 0;
+    while (i < 8) {
+        while (score[i+1] <= score[i] && i < 9) {
+            ++i;
+        }
+        if (i < 9 && score[i+1] > score[i]) {
+            string tempn = name[i];
+            int temps = score[i];
             Uid tempu = ids[i];
             ids[i] = ids[i+1];
             ids[i+1] = tempu;
-			name[i] = name[i+1];
-			score[i] = score[i+1];
-			name[i+1] = tempn;
-			score[i+1] = temps;
-			i = 0;
-		}
-	}
+            name[i] = name[i+1];
+            score[i] = score[i+1];
+            name[i+1] = tempn;
+            score[i+1] = temps;
+            i = 0;
+        }
+    }
 }
 
 
 bool Highscorer::addScore(std::string name, int score) {
-	int putHere = -1;
-	for (int i = 0; i < 10; i++) {
-		if (currentScore[i] == 0) putHere = i;
-	}
-	if (putHere != -1) {
-		currentScore[putHere] = score;
-		currentBoard[putHere] = name;
+    int putHere = -1;
+    for (int i = 0; i < 10; i++) {
+        if (currentScore[i] == 0) putHere = i;
+    }
+    if (putHere != -1) {
+        currentScore[putHere] = score;
+        currentBoard[putHere] = name;
         Uid uid = UniqueIdentifier::getUid(name);
         //cout << "Made an uid" << uid << endl;
         currentId[putHere] = uid;
-		refreshFile();
-		return true;
-	}
-	else {
-		int smallest = score;
-		for (int i = 0; i < 10; i++) {
-				if (currentScore[i] < smallest) {
-					smallest = currentScore[i];
-					putHere = i;
-				}
-		}
-		if (putHere != -1) {
-			currentScore[putHere] = score;
-			currentBoard[putHere] = name;
+        refreshFile();
+        return true;
+    }
+    else {
+        int smallest = score;
+        for (int i = 0; i < 10; i++) {
+                if (currentScore[i] < smallest) {
+                    smallest = currentScore[i];
+                    putHere = i;
+                }
+        }
+        if (putHere != -1) {
+            currentScore[putHere] = score;
+            currentBoard[putHere] = name;
             Uid uid = UniqueIdentifier::getUid(name);
             cout << "Made an uid" << uid << endl;
             currentId[putHere] = uid;
-	 		refreshFile();
-	 		return true;
-		}
-	}
-	return false;
+             refreshFile();
+             return true;
+        }
+    }
+    return false;
 }
 void Highscorer::replaceList(std::string names[10], int scores[10], Uid ids[10])
 {
@@ -167,47 +167,47 @@ void Highscorer::replaceList(std::string names[10], int scores[10], Uid ids[10])
 
 
 void Highscorer::refreshFile() {
-	Document scoreBoard;
-	if (!fileExists(hsFilename)) setFile(prototype);
-	else {
-		scoreBoard.Parse(readFile().c_str());
-		if (!validate(&scoreBoard)) setFile(prototype);
-	}
-	scoreBoard.Parse(readFile().c_str());
+    Document scoreBoard;
+    if (!fileExists(hsFilename)) setFile(prototype);
+    else {
+        scoreBoard.Parse(readFile().c_str());
+        if (!validate(&scoreBoard)) setFile(prototype);
+    }
+    scoreBoard.Parse(readFile().c_str());
 
-	Value::MemberIterator names = scoreBoard.FindMember("name");
-	Value::MemberIterator scores = scoreBoard.FindMember("score");
+    Value::MemberIterator names = scoreBoard.FindMember("name");
+    Value::MemberIterator scores = scoreBoard.FindMember("score");
     auto ids = scoreBoard.FindMember("uid");
-	for (int i = 0; i < 10; i++) {
-		const char* thisname = currentBoard[i].c_str();
-		names->value[i] = StringRef(thisname);
-		scores->value[i] = currentScore[i];
+    for (int i = 0; i < 10; i++) {
+        const char* thisname = currentBoard[i].c_str();
+        names->value[i] = StringRef(thisname);
+        scores->value[i] = currentScore[i];
         const char* thisId = currentId[i].c_str();
         ids->value[i] = StringRef(thisId);
-	}
-	rapidjson::StringBuffer buffer;
-	buffer.Clear();
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	scoreBoard.Accept(writer);
-	setFile(buffer.GetString());
+    }
+    rapidjson::StringBuffer buffer;
+    buffer.Clear();
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    scoreBoard.Accept(writer);
+    setFile(buffer.GetString());
 
 }
 
 
 void Highscorer::updateLists(Document *d) {
-	for (int i = 0; i < 10; i++) {
-		currentBoard[i] = "";
-		currentScore[i] = 0;
+    for (int i = 0; i < 10; i++) {
+        currentBoard[i] = "";
+        currentScore[i] = 0;
         currentId[i] = "";
-		Value::MemberIterator names = d->FindMember("name");
-		Value::MemberIterator scores = d->FindMember("score");
+        Value::MemberIterator names = d->FindMember("name");
+        Value::MemberIterator scores = d->FindMember("score");
         Value::MemberIterator ids = d->FindMember("uid");
-		if (names->value[i].IsString()) {
-			currentBoard[i] = names->value[i].GetString();
-			currentScore[i] = scores->value[i].GetInt();
+        if (names->value[i].IsString()) {
+            currentBoard[i] = names->value[i].GetString();
+            currentScore[i] = scores->value[i].GetInt();
             currentId[i] = ids->value[i].GetString();
-		}
-	}
+        }
+    }
 }
 
 
@@ -248,53 +248,53 @@ std::string decrypt(std::string const& msg, std::string const& key)
 
 void Highscorer::setFile(string t) {
     //cout << "Creating encrypted highscore file" << hsFilename << endl;
-	remove (hsFilename);
-	ofstream out(hsFilename);
-	string enc = encrypt(t, key);
-	out << enc;
-	out.close();
+    remove (hsFilename);
+    ofstream out(hsFilename);
+    string enc = encrypt(t, key);
+    out << enc;
+    out.close();
 }
 
 
 string Highscorer::readFile() {
-	file = fopen(hsFilename, "rb");
-	stringstream s;
-	char c;
-	do {
-		c = fgetc(file);
-		s << c;
-	} while (c != EOF );
-	string out = decrypt(s.str(), key);
-	while(out.back() != '}' && out.size() > 0){
-		out.pop_back();
-	}
-	fclose(file);
-	return out;
+    file = fopen(hsFilename, "rb");
+    stringstream s;
+    char c;
+    do {
+        c = fgetc(file);
+        s << c;
+    } while (c != EOF );
+    string out = decrypt(s.str(), key);
+    while(out.back() != '}' && out.size() > 0){
+        out.pop_back();
+    }
+    fclose(file);
+    return out;
 }
 
 bool Highscorer::validate(Document *d) {
-	bool valid = true;
-	if (!d->IsObject()) valid = false;
+    bool valid = true;
+    if (!d->IsObject()) valid = false;
 
-	Value::MemberIterator here = d->FindMember("name");
-	if (here == d->MemberEnd()) valid = false;
-	if (!(here->value.IsArray())) valid = false;
-	for (int i = 0; i < 10; i++) {
-		if (!(here->value[i].IsString())) valid = false;
-	}
+    Value::MemberIterator here = d->FindMember("name");
+    if (here == d->MemberEnd()) valid = false;
+    if (!(here->value.IsArray())) valid = false;
+    for (int i = 0; i < 10; i++) {
+        if (!(here->value[i].IsString())) valid = false;
+    }
 
-	here = d->FindMember("score");
-	if (here == d->MemberEnd()) valid = false;
-	if (!(here->value.IsArray())) valid = false;
-	for (int i = 0; i < 10; i++) {
-		if (!(here->value[i].IsNumber())) valid = false;
-	}
+    here = d->FindMember("score");
+    if (here == d->MemberEnd()) valid = false;
+    if (!(here->value.IsArray())) valid = false;
+    for (int i = 0; i < 10; i++) {
+        if (!(here->value[i].IsNumber())) valid = false;
+    }
     here = d->FindMember("uid");
     if (here == d->MemberEnd()) valid = false;
     else if (!(here->value.IsArray())) valid = false;
-	for (int i = 0; i < 10; i++) {
-		if (!(here->value[i].IsString())) valid = false;
-	}
+    for (int i = 0; i < 10; i++) {
+        if (!(here->value[i].IsString())) valid = false;
+    }
     return valid;
 }
 

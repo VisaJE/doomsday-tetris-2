@@ -85,8 +85,8 @@ void WebConf::makeConf()
         defaultString << ",\n\"" << i << "\": \"\"";
     }
     defaultString << "}";
-	remove (CONFIG_NAME);
-	std::ofstream out(CONFIG_NAME);
-	out << defaultString.str();
-	out.close();
+    remove (CONFIG_NAME);
+    std::ofstream out(CONFIG_NAME);
+    out << defaultString.str();
+    out.close();
 }

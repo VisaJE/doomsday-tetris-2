@@ -18,35 +18,35 @@ namespace tet {
 
 class Grid {
 public:
-	Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth, bool& isFastDrop);
-	virtual ~Grid();
-	bool lost = false;
-	int height;
-	int width;
-	bool isThere(int h, int w);
-	long getPoints();
-	int droppedAmount();
-	bool tick();
-	void moveL();
-	void moveR();
-	void rotate();
-	void wholeDrop();
-	bool addBlock(Block block);
-	void refresh();
-	void wholeTick();
-	void reset();
-	void printGrid();
-	typedef void (Grid::*GridFunc)(void);
+    Grid(StaticBlock inp, UberBlockifier uber, const int boardHeight, const int boardWidth, bool& isFastDrop);
+    virtual ~Grid();
+    bool lost = false;
+    int height;
+    int width;
+    bool isThere(int h, int w);
+    long getPoints();
+    int droppedAmount();
+    bool tick();
+    void moveL();
+    void moveR();
+    void rotate();
+    void wholeDrop();
+    bool addBlock(Block block);
+    void refresh();
+    void wholeTick();
+    void reset();
+    void printGrid();
+    typedef void (Grid::*GridFunc)(void);
 private:
-	long points = 0;
-	int blocksDropped = 0;
-	StaticBlock staticBlock;
-	UberBlockifier blockGen;
-	Block dropBlock;
+    long points = 0;
+    int blocksDropped = 0;
+    StaticBlock staticBlock;
+    UberBlockifier blockGen;
+    Block dropBlock;
     bool& isFastDrop;
-	vector<bool> grid;
-	int blockPos[2]; // (y, x)
-	bool slide(int y, int x, int l);
+    vector<bool> grid;
+    int blockPos[2]; // (y, x)
+    bool slide(int y, int x, int l);
 
 };
 } /* namespace tet */

@@ -12,18 +12,18 @@ namespace tet {
 
 class Block {
 public:
-	virtual ~Block();
-	Block(int h, int w, std::vector<bool> g);
-	Block();
-	int height;
-	int width;
-	bool isThere(int h, int w);
-	void rotate();
-	void rotateBack();
-	void massCenter(int res[2]); // Mass center given (y, x)
-	int mass;
+    virtual ~Block();
+    Block(int h, int w, std::vector<bool> g);
+    Block();
+    int height;
+    int width;
+    bool isThere(int h, int w);
+    void rotate();
+    void rotateBack();
+    void massCenter(int res[2]); // Mass center given (y, x)
+    int mass;
 private:
-	std::vector<bool> grid;
+    std::vector<bool> grid;
 };
 
 } /* namespace tet */

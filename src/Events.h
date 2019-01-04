@@ -20,36 +20,36 @@ namespace tet {
 
 class Events {
 public:
-	Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable, bool &fastDropInitiated);
-	virtual ~Events();
-	bool paused;
-	bool quit;
-	int slideSpeed;
-	bool goingLeft();
-	bool goingRight();
-	Grid *g;
-	int init();
-	int menu();
+    Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable, bool &fastDropInitiated);
+    virtual ~Events();
+    bool paused;
+    bool quit;
+    int slideSpeed;
+    bool goingLeft();
+    bool goingRight();
+    Grid *g;
+    int init();
+    int menu();
     int globalScoreList();
-	Uint32 currentInterval;
-	SDL_mutex *mutex;
-	std::queue<Grid::GridFunc> callQue;
+    Uint32 currentInterval;
+    SDL_mutex *mutex;
+    std::queue<Grid::GridFunc> callQue;
     Highscorer& getLocalHighscores();
     Highscorer hs;
 private:
     GlobalHighscore globalHs;
-	bool fairToScore;
-	int setHighscore();
-	int startInt;
+    bool fairToScore;
+    int setHighscore();
+    int startInt;
     int baseInterval;
     bool speedUpdated =true;//Keeps track whether the base interval has been updated for this block.
-	SDL_Event event;
-	Screen* screen;
-	bool& sPressed; //sPressed is now a reference to a common bool between events and grid.
-	bool aPressed = false;
-	bool dPressed = false;
-	bool pause();
-	void setDropSpeed();
+    SDL_Event event;
+    Screen* screen;
+    bool& sPressed; //sPressed is now a reference to a common bool between events and grid.
+    bool aPressed = false;
+    bool dPressed = false;
+    bool pause();
+    void setDropSpeed();
 
 };
 
