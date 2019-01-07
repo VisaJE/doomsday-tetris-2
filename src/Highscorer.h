@@ -29,6 +29,7 @@ public:
     int getHighest();
     int getLowest();
 private:
+    void getFromFile();
     const char* hsFilename;
     FILE* file;
     void setFile(std::string t);

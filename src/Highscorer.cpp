@@ -23,6 +23,10 @@ using namespace rapidjson;
 namespace tet {
 
 Highscorer::Highscorer(const char* hs_filename): hsFilename(hs_filename) {
+    getFromFile();
+}
+
+void Highscorer::getFromFile() {
     for (int i = 0; i < 10; i++) {
         currentScore[i] = 0;
     }
@@ -45,7 +49,6 @@ Highscorer::Highscorer(const char* hs_filename): hsFilename(hs_filename) {
             }
         } catch (int i) { cout << "Failure in setting the leaderboard." << endl;}
     }
-
 }
 
 Highscorer::~Highscorer() {
@@ -121,6 +124,7 @@ void Highscorer::sort(string name[10], int score[10], Uid ids[10]) {
 
 
 bool Highscorer::addScore(std::string name, int score) {
+    getFromFile();
     int putHere = -1;
     for (int i = 0; i < 10; i++) {
         if (currentScore[i] == 0) putHere = i;
