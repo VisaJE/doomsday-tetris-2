@@ -150,7 +150,7 @@ bool Highscorer::addScore(std::string name, int score) {
             currentScore[putHere] = score;
             currentBoard[putHere] = name;
             Uid uid = UniqueIdentifier::getUid(name);
-            cout << "Made an uid" << uid << endl;
+            //cout << "Made an uid" << uid << endl;
             currentId[putHere] = uid;
              refreshFile();
              return true;
