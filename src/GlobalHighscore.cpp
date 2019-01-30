@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "Highscorer.h"
 #include "UniqueIdentifier.h"
+#include "Log.h"
 
 using namespace tet;
 GlobalHighscore::GlobalHighscore(Highscorer *context): context(context)
@@ -32,8 +33,11 @@ bool GlobalHighscore::updateData()
     int tscores[10];
     std::string tnames[10];
     Uid ids[10];
+    LOG("Getting highscore from server\n");
     context->getHighscore(tnames, tscores, ids);
+    LOG("Pushing highscore to server\n");
     connection.pushList(tnames, tscores, ids);
+    LOG("New list from server\n");
     connection.topList(names, scores);
     return true;
 }
