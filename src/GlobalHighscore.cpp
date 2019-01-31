@@ -32,9 +32,13 @@ bool GlobalHighscore::updateData()
     int tscores[10];
     std::string tnames[10];
     Uid ids[10];
+    //std::cout << "Getting hs" << std::endl;
     context->getHighscore(tnames, tscores, ids);
+    //std::cout << "Pushing hs" << std::endl;
     connection.pushList(tnames, tscores, ids);
+    //std::cout << "Getting top hs" << std::endl;
     connection.topList(names, scores);
+    //std::cout << "Done" << std::endl;
     return true;
 }
 
