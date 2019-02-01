@@ -4,6 +4,7 @@
 #include <sstream>
 #include <unistd.h>
 #include "UniqueIdentifier.h"
+#include "Log.h"
 
 using namespace tet;
 
@@ -166,7 +167,20 @@ void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
     Uid onlIds[10];
     for (int i = 0; i < 10; i++) onlScores[i] = 0;
     getIdList(onlIds, onlScores);
-    // std::cout << "Found: " << std::endl;
+    LOG("Found highscore from server\n%s %i\n \
+             %s %i\n  %s %i\n  %s %i\n  %s %i\n  %s %i\n\
+             %s %i\n  %s %i\n  %s %i\n  %s %i\n",
+            onlIds[0].c_str(), onlScores[0],
+            onlIds[1].c_str(), onlScores[1],
+            onlIds[2].c_str(), onlScores[2],
+            onlIds[3].c_str(), onlScores[3],
+            onlIds[4].c_str(), onlScores[4],
+            onlIds[5].c_str(), onlScores[5],
+            onlIds[6].c_str(), onlScores[6],
+            onlIds[7].c_str(), onlScores[7],
+            onlIds[8].c_str(), onlScores[8],
+            onlIds[9].c_str(), onlScores[9]
+            );
     // for (int i = 0; i < 10; i++) std::cout << onlIds[i] << ", " << onlScores[i] << std::endl;
     std::string basicS = "INSERT INTO " + tablename +
         " (name, score, uid) VALUES (";
@@ -174,7 +188,8 @@ void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
     int idCollisions = 0;
     int inserted = 0;
     int LastLocal = 0;
-    while(scores[LastLocal] >0) LastLocal++;
+    while(LastLocal < 10 && scores[LastLocal] >0) LastLocal++;
+    LOG("Last local index %d", LastLocal);
     for (int local = 0; local < LastLocal; local++)
     {
         for (int online = local - idCollisions-inserted; online < 10-inserted; online++)

@@ -11,7 +11,7 @@
     char buf[10];
     for (int i = 0; i < 10; i++)
     {
-       buf[i] = (char)(name.at(i%name.size()) + (int)(idNum / pow(10, i))%10 + 1)%25 + 65;
+       buf[i] = (char)((name.at(i%name.size()) + (int)(idNum / pow(10, i))%10 + 1)%26 + 65);
     }
     //std::cout << "Created identifier " << buf << std::endl;
     return (std::string) buf;
