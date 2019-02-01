@@ -167,9 +167,9 @@ void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
     Uid onlIds[10];
     for (int i = 0; i < 10; i++) onlScores[i] = 0;
     getIdList(onlIds, onlScores);
-    LOG("Found highscore from server\n%s %i\n \
-             %s %i\n  %s %i\n  %s %i\n  %s %i\n  %s %i\n\
-             %s %i\n  %s %i\n  %s %i\n  %s %i\n",
+    LOG("Found highscore from server\n%s %i\n"
+        "%s %i\n%s %i\n%s %i\n%s %i\n%s %i\n"
+        "%s %i\n%s %i\n%s %i\n%s %i\n",
             onlIds[0].c_str(), onlScores[0],
             onlIds[1].c_str(), onlScores[1],
             onlIds[2].c_str(), onlScores[2],
@@ -189,7 +189,7 @@ void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
     int inserted = 0;
     int LastLocal = 0;
     while(LastLocal < 10 && scores[LastLocal] >0) LastLocal++;
-    LOG("Last local index %d", LastLocal);
+    LOG("Last local index %d\n", LastLocal);
     for (int local = 0; local < LastLocal; local++)
     {
         for (int online = local - idCollisions-inserted; online < 10-inserted; online++)
