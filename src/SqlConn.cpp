@@ -121,6 +121,7 @@ bool SqlConn::getLowest(int& score)
 
 bool SqlConn::getIdList(Uid ids[10], int scores[10])
 {
+    LOG("Getting remote guids.\n");
     if (!checkConnection()) return false;
     std::stringstream query;
     query << "SELECT uid, score FROM "<< tablename;
@@ -159,14 +160,19 @@ bool SqlConn::checkConnection()
 }
 
 /*
- * Pushes names and scores if they will appear on the top 10.
+ * Pushes names and scores if they will appear on the top 10
+ * and do not exist yet.
  */
 void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
 {
     int onlScores[10];
     Uid onlIds[10];
     for (int i = 0; i < 10; i++) onlScores[i] = 0;
-    getIdList(onlIds, onlScores);
+    if (!getIdList(onlIds, onlScores)) 
+    {
+        LOG("Finding guids failed\n");
+        return;
+    }
     LOG("Found highscore from server\n%s %i\n"
         "%s %i\n%s %i\n%s %i\n%s %i\n%s %i\n"
         "%s %i\n%s %i\n%s %i\n%s %i\n",

@@ -69,6 +69,7 @@ void Highscorer::getHighscore(string name[10], int score[10], Uid id[10]) {
             name[i] = currentBoard[i];
             score[i] = currentScore[i];
             id[i] = currentId[i];
+            if (id[i].size() > 10) id[i] = id[i].substr(0,10);
     }
     sort(name, score, id);
 }

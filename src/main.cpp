@@ -16,6 +16,7 @@
 #include "UberBlockifier.h"
 #include "Events.h"
 #include "GlobalHighscore.h"
+#include "Log.h"
 
 using namespace std;
 using namespace tet;
@@ -28,6 +29,8 @@ int main()  {
         cout << "FAIL" << endl;
         return 1;
     }
+
+    LOG("Debug build\n");
 
     //Lets test the glboal highscore system
     // Configuring

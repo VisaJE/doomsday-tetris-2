@@ -3,6 +3,7 @@
 #include <random>
 #include <time.h>
 #include <stdlib.h>
+#include "Log.h"
 
  Uid tet::UniqueIdentifier::getUid(std::string name)
 {
@@ -16,7 +17,10 @@
     //std::cout << "Created identifier " << buf << std::endl;
     return (std::string) buf;
 }
+
  bool tet::UniqueIdentifier::compare(Uid f, Uid s)
 {
+    LOG("Comparing %s to %s yielding %d\n", f.c_str(), s.c_str(), !f.compare(s));
     return !f.compare(s);
 }
+
