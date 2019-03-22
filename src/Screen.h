@@ -11,6 +11,7 @@
 #include "Grid.h"
 #include "BoxTexture.h"
 #include <vector>
+#include "ProcessTimer.h"
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
@@ -57,6 +58,7 @@ private:
     SDL_Rect infoRect;
     bool horizontal;
     bool useDelta;
+    ProcessTimer pt;
 };
 
 } /* namespace tet */

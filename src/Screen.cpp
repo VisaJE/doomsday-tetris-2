@@ -17,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include "ProcessTimer.h"
 
 namespace tet {
 
@@ -73,11 +74,13 @@ void Screen::setSizes()
 }
 
 
-Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g), useDelta(false) {
+Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g), useDelta(false),
+pt(ProcessTimer(20, "Screen timer"))
+{  
     TTF_Init();
 
     isDestroyed = false;
-  Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
+    Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
     window = SDL_CreateWindow("DoomsdayTetris-2",
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
     if (window==NULL)  {
@@ -86,7 +89,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
         throw 10;
     }
 
-  windowID = SDL_GetWindowID(window);
+    windowID = SDL_GetWindowID(window);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) {
@@ -94,12 +97,12 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
         destroy();
         throw 11;
     }
-  setSizes();
-  setTexture();
-  setFonts();
-
+    setSizes();
+    setTexture();
+    setFonts();
     textColor = {200, 200, 200};
     refresh();
+    
 }
 void Screen::setFonts()
 {
@@ -419,6 +422,7 @@ void Screen::printNoBlock(int h,int w)
 
 
 void Screen::printGrid() {
+    pt.start();
     SDL_SetWindowResizable(window, SDL_FALSE);
     if (useDelta && GRID->isDeltaUsable())
     {
@@ -447,6 +451,7 @@ void Screen::printGrid() {
     }
     refresh();
     GRID->clearDelta();
+    pt.end();
 }
 
 void Screen::pause() {

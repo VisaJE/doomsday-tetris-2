@@ -9,16 +9,17 @@ class ProcessTimer
 {
     public:
         ProcessTimer(unsigned repeats, std::string name);
-        ProcessTimer(unsigned repeats);
         virtual ~ProcessTimer();
         void tick();
+        void start();
+        void end();
         double getTimeSeconds();
     private:
         unsigned repeats;
         unsigned counter;
         std::string name;
         clock_t refTime;
-        double time;
+        clock_t time;
 
 };
 

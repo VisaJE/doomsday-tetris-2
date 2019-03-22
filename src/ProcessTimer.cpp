@@ -11,11 +11,9 @@ ProcessTimer::ProcessTimer(unsigned repeats, std::string name):
     refTime = clock();
 }
 
-ProcessTimer::ProcessTimer(unsigned repeats):
-    repeats(repeats), counter(0), name("Timer"), refTime(0.0), time(0.0)
+ProcessTimer::~ProcessTimer()
 {
 }
-
 void ProcessTimer::tick()
 {
     if (counter++ >= repeats)
@@ -24,10 +22,28 @@ void ProcessTimer::tick()
         time = (double) timeN- refTime;
         refTime = timeN;
         counter = 0;
+        LOG("Timer %s counted time %f", name.c_str(), (double)time/CLOCKS_PER_SEC);
+    }
+}
+
+
+void ProcessTimer::start()
+{
+    refTime = clock();
+}
+void ProcessTimer::end()
+{
+    auto tN = clock();
+    time += tN-refTime;
+    if (counter ++ >= repeats)
+    {
+        time = 0;
+        counter = 0;
+        LOG("Timer %s counted time %f", name.c_str(), (double)time/CLOCKS_PER_SEC);
     }
 }
 
 double ProcessTimer::getTimeSeconds()
 {
-    return time/CLOCKS_PER_SEC;
+    return (double)time/CLOCKS_PER_SEC;
 }

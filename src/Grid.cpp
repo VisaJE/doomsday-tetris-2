@@ -258,7 +258,6 @@ void Grid::reset() {
 
 
 void Grid::clearDelta() {
-    LOG("clearDelta()\n");
     if (delta.size() > 0) delta.clear();
     useDelta = true;
 }
