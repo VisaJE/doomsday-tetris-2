@@ -37,8 +37,8 @@ public:
     void reset();
     void printGrid();
     void clearDelta();
-    std::vector<std::pair<int, int>>* getDelta() {return &delta;}
-    bool isDeltaUsable() {return useDelta;}
+    std::vector<std::pair<int, int>>* getDelta(); 
+    bool isDeltaUsable(); 
     typedef void (Grid::*GridFunc)(void);
 private:
     long points = 0;

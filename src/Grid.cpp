@@ -36,6 +36,7 @@ Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int 
 }
 
 Grid::~Grid() {
+    LOG("~Grid()\n");
 }
 
 
@@ -262,6 +263,10 @@ void Grid::clearDelta() {
     useDelta = true;
 }
 
+
+std::vector<std::pair<int,int>>* Grid::getDelta() {return &delta;}
+
+bool Grid::isDeltaUsable() {return useDelta;}
 
 void Grid::printGrid() {
     cout << "Points: " << points << endl;

@@ -12,6 +12,7 @@
 #include "Grid.h"
 #include <math.h>
 #include "BoxTexture.h"
+#include "Log.h"
 #include <vector>
 #include <string>
 #include <sstream>
@@ -67,7 +68,7 @@ void Screen::setSizes()
         infoRect.h = SCREEN_HEIGHT;
     }
     boxTexture = BoxTexture(boxSize);
-  
+
   SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -145,6 +146,7 @@ void Screen::changeSize(int h, int w)
 }
 
 Screen::~Screen() {
+    LOG("~Screen()\n");
     destroy();
     TTF_Quit();
 }
@@ -437,7 +439,7 @@ void Screen::printGrid() {
                 if (GRID->isThere(h, w)) {
                     printBlock(h, w);
                 } else {
-                    printNoBlock(h ,w); 
+                    printNoBlock(h, w);
                 }
             }
         }

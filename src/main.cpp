@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include "Screen.h"
 #include "Grid.h"
+#include "Log.h"
 #include "Conf.h"
 #include "StaticBlock.h"
 #include "UberBlockifier.h"
@@ -48,6 +49,7 @@ int main()  {
     Events eventHandler(&screen, &gameGrid, conf.startInterval, conf.slideSpeed, conf.competitionValid(), fastDropInitiated);
     eventHandler.menu();
 
+    LOG("Doing SQL_Quit()\n");
     SDL_Quit();
     return 0;
 }
