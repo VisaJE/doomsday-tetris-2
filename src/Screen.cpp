@@ -75,8 +75,8 @@ void Screen::setSizes()
 
 
 Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g), useDelta(false),
-pt(ProcessTimer(20, "Screen timer"))
-{  
+pt(ProcessTimer(100, "Screen timer"))
+{
     TTF_Init();
 
     isDestroyed = false;
@@ -102,7 +102,7 @@ pt(ProcessTimer(20, "Screen timer"))
     setFonts();
     textColor = {200, 200, 200};
     refresh();
-    
+
 }
 void Screen::setFonts()
 {

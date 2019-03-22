@@ -37,9 +37,9 @@ void ProcessTimer::end()
     time += tN-refTime;
     if (counter ++ >= repeats)
     {
+        LOG("Timer %s counted time %f", name.c_str(), (double)time/CLOCKS_PER_SEC);
         time = 0;
         counter = 0;
-        LOG("Timer %s counted time %f", name.c_str(), (double)time/CLOCKS_PER_SEC);
     }
 }
 
