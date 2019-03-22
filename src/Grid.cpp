@@ -9,6 +9,7 @@
 #include "Block.h"
 #include "StaticBlock.h"
 #include "UberBlockifier.h"
+#include "Log.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -71,6 +72,7 @@ bool Grid::tick() {
                 }
             }
         }
+        LOG("Delta size %u", (unsigned)delta.size());
         blockPos[0] += 1;
         return true;
     }
@@ -241,6 +243,7 @@ void Grid::wholeTick() {
 
 
 void Grid::reset() {
+    LOG("reset");
     points = 0;
     blocksDropped = 0;
     staticBlock.reset();
@@ -254,8 +257,9 @@ void Grid::reset() {
 
 
 void Grid::clearDelta() {
-    delta.clear();
-    useDelta = true;
+    LOG("clearDelta()");
+    if (delta.size() > 0) delta.clear();
+    useDelta = false;
 }
 
 
