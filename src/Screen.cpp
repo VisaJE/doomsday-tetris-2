@@ -72,7 +72,7 @@ void Screen::setSizes()
 }
 
 
-Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g) {
+Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g), useDelta(false) {
     TTF_Init();
 
     isDestroyed = false;
@@ -191,6 +191,7 @@ void Screen::printHelp(SDL_Rect rect) {
 
 
 void Screen::menu(string names[10], int scores[10]) {
+    useDelta = false;
     SDL_SetWindowResizable(window, SDL_TRUE);
     SDL_Rect textArea;
     textArea.x = topLeft[1] + 45;
@@ -368,8 +369,6 @@ void Screen::refresh() {
         infoRect.h = texH;
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderCopy(renderer, message, NULL, &infoRect);
-
-
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(message);
         SDL_FreeSurface(gameInfo);
@@ -392,37 +391,64 @@ void Screen::setPixel(int y, int x, int r, int g, int b) {
     buffer[y*SCREEN_WIDTH+x] = color;
 }
 
-void Screen::printGrid() {
-    SDL_SetWindowResizable(window, SDL_FALSE);
-    for (int h = 0; h < GRID->height; h++) {
-        for (int w = 0; w < GRID->width; w++) {
-            if (GRID->isThere(h, w)) {
-                for (int y = 0; y < boxSize; y++) {
-                    for (int x = 0; x < boxSize; x++) {
-                        int r = min(0.01*GRID->droppedAmount()*boxTexture.getIntensity(y, x), 250.0);
-                        int g = boxTexture.getIntensity(y, x);
-                        int b = 50;
-                        setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
-                    }
-                }
-            } else {
-                for (int y = 0; y < boxSize; y++) {
-                    for (int x = 0; x < boxSize; x++) {
-                        int r = 10;
-                        int g =  10;
-                        int b = 50;
-                        setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
-                    }
-                }
-
-            }
+void Screen::printBlock(int h, int w)
+{
+    for (int y = 0; y < boxSize; y++) {
+        for (int x = 0; x < boxSize; x++) {
+            int r = min(0.01*GRID->droppedAmount()*boxTexture.getIntensity(y, x), 250.0);
+            int g = boxTexture.getIntensity(y, x);
+            int b = 50;
+            setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
         }
     }
-    refresh();
+}
 
+void Screen::printNoBlock(int h,int w)
+{
+    for (int y = 0; y < boxSize; y++) {
+        for (int x = 0; x < boxSize; x++) {
+            int r = 10;
+            int g =  10;
+            int b = 50;
+            setPixel(topLeft[0]+h*boxSize+y, topLeft[1]+w*boxSize+x, r ,g ,b);
+        }
+    }
+}
+
+
+void Screen::printGrid() {
+    SDL_SetWindowResizable(window, SDL_FALSE);
+    if (useDelta && GRID->isDeltaUsable())
+    {
+        for (auto p : *(GRID->getDelta)())
+        {
+           if (GRID->isThere(p.first, p.second))
+           {
+               printBlock(p.first, p.second);
+           } else
+           {
+               printNoBlock(p.first, p.second);
+           }
+        }
+    } else
+    {
+        for (int h = 0; h < GRID->height; h++) {
+            for (int w = 0; w < GRID->width; w++) {
+                if (GRID->isThere(h, w)) {
+                    printBlock(h, w);
+                } else {
+                    printNoBlock(h ,w); 
+                }
+            }
+        }
+        useDelta = true;
+    }
+    refresh();
+    GRID->clearDelta();
 }
 
 void Screen::pause() {
+    useDelta = false;
     for (int y = topLeft[0]; y < bottomRight[0]; y++) {
         for (int x = topLeft[1]; x < bottomRight[1]; x++) {
             setPixel(y, x, 10, 10, 50);

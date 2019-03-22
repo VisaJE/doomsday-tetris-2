@@ -36,6 +36,9 @@ public:
     void wholeTick();
     void reset();
     void printGrid();
+    void clearDelta();
+    std::vector<std::pair<int, int>>* getDelta() {return &delta;}
+    bool isDeltaUsable() {return useDelta;}
     typedef void (Grid::*GridFunc)(void);
 private:
     long points = 0;
@@ -45,6 +48,8 @@ private:
     Block dropBlock;
     bool& isFastDrop;
     vector<bool> grid;
+    vector<std::pair<int, int>> delta;
+    bool useDelta;
     int blockPos[2]; // (y, x)
     bool slide(int y, int x, int l);
 

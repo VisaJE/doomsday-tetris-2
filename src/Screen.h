@@ -36,10 +36,12 @@ private:
     SDL_Renderer *renderer=NULL;
     SDL_Texture *texture=NULL;
     bool isDestroyed;
-  void setSizes();
-  void setFonts();
-  void setTexture();
+    void setSizes();
+    void setFonts();
+    void setTexture();
     void refresh();
+    void printBlock(int y, int x);
+    void printNoBlock(int y, int x);
     void printHelp(SDL_Rect rect);
     void printHS(SDL_Rect hsArea,string names[10], int scores[10], const char* header);
     void setPixel(int x, int y, int r, int g, int b);
@@ -54,6 +56,7 @@ private:
     SDL_Color textColor;
     SDL_Rect infoRect;
     bool horizontal;
+    bool useDelta;
 };
 
 } /* namespace tet */

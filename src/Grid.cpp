@@ -23,7 +23,9 @@ Grid::Grid(StaticBlock inp, UberBlockifier uber,const int boardHeight,const int 
     staticBlock(inp),
     blockGen(uber),
     dropBlock(blockGen.getABlock()),
-    isFastDrop(isFastDrop) {
+    isFastDrop(isFastDrop),
+    useDelta(false)
+{
     for (int i = 0; i<height*width;i++) {
         grid.push_back(false);
     }
@@ -57,8 +59,15 @@ bool Grid::tick() {
         for (int i=dropBlock.height-1;i>=0;i--) {
             for (int j=0;j<dropBlock.width;j++) {
                 if (dropBlock.isThere(i, j)) {
-                    grid[(i+blockPos[0])*width + j+blockPos[1]] = false;
-                    grid[(i + 1 + blockPos[0])*width+j+blockPos[1]] = true;
+                    auto y = i+blockPos[0];
+                    auto x = j+blockPos[1];
+                    grid[(y)*width + x] = false;
+                    grid[(y+1)*width+x] = true;
+                    if (useDelta)
+                    {
+                        delta.push_back({y,x});
+                        delta.push_back({y+1, x});
+                    }
                 }
             }
         }
@@ -75,8 +84,12 @@ void Grid::moveL() {
                 for (int i=dropBlock.height-1;i>=0;i--) {
                     for (int j=0;j<dropBlock.width;j++) {
                         if (dropBlock.isThere(i, j)) {
-                            grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
-                            grid[ (i + blockPos[0])*width + j+blockPos[1] - 1] = true;
+                            auto y = i+blockPos[0];
+                            auto x = j+blockPos[1];
+                            grid[y*width +x] = false;
+                            grid[ y*width + x - 1] = true;
+                            delta.push_back({y, x});
+                            delta.push_back({y, x-1});
                         }
                     }
                 }
@@ -94,8 +107,12 @@ void Grid::moveR() {
                 for (int i=dropBlock.height-1;i>=0;i--) {
                     for (int j=dropBlock.width-1;j>=0;j--) {
                         if (dropBlock.isThere(i, j)) {
-                            grid[(i+blockPos[0])*width +j+blockPos[1]] = false;
-                            grid [(i + blockPos[0])*width+ j+blockPos[1] + 1] = true;
+                            auto y = i+blockPos[0];
+                            auto x = j+blockPos[1];
+                            grid[y*width +x] = false;
+                            grid[ y*width + x + 1] = true;
+                            delta.push_back({y, x});
+                            delta.push_back({y, x+1});
                         }
                     }
                 }
@@ -155,6 +172,7 @@ void Grid::refresh() {
 
 void Grid::rotate() {
     if (!lost) {
+        useDelta = false;
         int oldCenter[2];
         dropBlock.massCenter(oldCenter);
         dropBlock.rotate();
@@ -165,7 +183,6 @@ void Grid::rotate() {
         int y = max(blockPos[0] + yPosFix, 0);
         int x = blockPos[1] + xPosFix;
         int sideTreshold = (int)ceil(dropBlock.width/2.0);
-   //     cout << "sliding at most " << sideTreshold << endl;
         if (slide(y, x, sideTreshold)) {
             refresh();
         } else {
@@ -198,6 +215,7 @@ bool Grid::slide(int y, int x, int l) {
 void Grid::wholeDrop() {
     if (!lost) {
         int p = 0;
+        useDelta = false;
         while (tick()) {
             p++;
         }
@@ -230,9 +248,15 @@ void Grid::reset() {
     blockPos[0] = 0;
     blockPos[1] = (width-dropBlock.width) / 2;
     lost = false;
+    useDelta = false;
     refresh();
 }
 
+
+void Grid::clearDelta() {
+    delta.clear();
+    useDelta = true;
+}
 
 
 void Grid::printGrid() {
