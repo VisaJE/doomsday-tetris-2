@@ -72,7 +72,7 @@ bool Grid::tick() {
                 }
             }
         }
-        LOG("Delta size %u", (unsigned)delta.size());
+        LOG("Delta size %u\n", (unsigned)delta.size());
         blockPos[0] += 1;
         return true;
     }
@@ -243,7 +243,7 @@ void Grid::wholeTick() {
 
 
 void Grid::reset() {
-    LOG("reset");
+    LOG("reset\n");
     points = 0;
     blocksDropped = 0;
     staticBlock.reset();
@@ -257,9 +257,9 @@ void Grid::reset() {
 
 
 void Grid::clearDelta() {
-    LOG("clearDelta()");
+    LOG("clearDelta()\n");
     if (delta.size() > 0) delta.clear();
-    useDelta = false;
+    useDelta = true;
 }
 
 
