@@ -24,10 +24,10 @@ AC_ENABLE_SHARED
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL(libtool)
 
-AC_CHECK_LIB([SDL2] [SDL_Init], [], [AC_MSG_ERROR([SDL2 was not found in libm])])
-AC_CHECK_LIB([SDL2_ttf] [TTF_OpenFont], [], [AC_MSG_ERROR([SDL2 ttf was not found in libm])])
-AC_CHECK_LIB([pq] [PQconnectdb], [], [AC_MSG_ERROR([pq-fe was not found in libm])])
-AC_CHECK_LIB([Fontconfig] [FcInitLoadConfigAndFonts], [], [AC_MSG_ERROR([Fontconfig was not found in libm])])
+AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([SDL2 was not found])])
+AC_CHECK_LIB([SDL2_ttf], [TTF_OpenFont], [], [AC_MSG_ERROR([SDL2 ttf was not found])])
+AC_CHECK_LIB([pq], [PQconnectdb], [], [AC_MSG_ERROR([pq-fe was not found in libm])])
+AC_CHECK_LIB([fontconfig], [FcInitLoadConfigAndFonts], [], [AC_MSG_ERROR([Fontconfig was not found])])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h unistd.h])

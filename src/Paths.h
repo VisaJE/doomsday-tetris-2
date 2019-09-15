@@ -32,9 +32,9 @@ class Paths
 
         static std::string highscorePath()
         {
-            auto confDir = configDir();
-            confDir.append("/.hs.json");
-            return confDir;
+            auto dir = dataDir();
+            dir.append("/.hs.json");
+            return dir;
         }
 
         static std::string findFont(const char* name)
@@ -93,7 +93,6 @@ class Paths
         static std::string configDir()
         {
             const char* overrideDir = std::getenv("XDG_CONFIG_HOME");
-            if (overrideDir) LOG("Found XDG_CONFIG_HOME %s\n", overrideDir);
 
             std::string home = std::getenv("HOME");
             std::string confDir = overrideDir ? overrideDir : home + "/.config/";
@@ -105,5 +104,18 @@ class Paths
             return confDir;
         }
 
+        static std::string dataDir()
+        {
+            const char* overrideDir = std::getenv("XDG_DATA_HOME");
+
+            std::string home = std::getenv("HOME");
+            std::string confDir = overrideDir ? overrideDir : home + "/.local/share/";
+
+            if (confDir.at(confDir.length() - 1) != '/') confDir.append("/");
+            confDir.append( "DoomsdayTetris");
+
+            createDirs(confDir);
+            return confDir;
+        }
 };
 }

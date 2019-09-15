@@ -1,5 +1,5 @@
 .settings
-.deps/
+.ycm_*
 Debug
 
 DoomsdayTetris2
@@ -22,23 +22,4 @@ Makefile.in
 obj/
 *.o
 Release/
-k
 compile
-
-config*
-stamp*
-
- m4/
-*.m4
-
-libtool
-ltmain.sh
-install*
-missing
-*.log
-
-*.cache
-*.sub
-*.status
-
-depcomp
