@@ -14,6 +14,7 @@
 #include <thread>
 #include "math.h"
 #include "Log.h"
+#include "Paths.h"
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))()
 
@@ -33,7 +34,7 @@ Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool score
     slideSpeed(slideSpeed),
     g(g),
     currentInterval(startInterval),
-    hs(Highscorer(HIGHSCORE_PATH)),
+    hs(Highscorer(Paths::highscorePath().c_str())),
     globalHs(GlobalHighscore(&hs)),
     fairToScore(scoreable),
     startInt(startInterval),

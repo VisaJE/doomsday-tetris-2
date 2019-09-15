@@ -15,10 +15,6 @@
 #include "GlobalHighscore.h"
 #include "queue"
 
-#ifndef HIGHSCORE_PATH
-#define HIGHSCORE_PATH ".hs.json"
-#endif
-
 namespace tet {
 
 class Events {

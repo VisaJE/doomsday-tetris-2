@@ -12,6 +12,7 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
 #include <cstdio>
+#include "Paths.h"
 
 using namespace rapidjson;
 
@@ -72,7 +73,7 @@ bool Conf::checkValidity(Document *d) {
 
 
 void Conf::fallBack(FILE* *config, rapidjson::Document *defa) {
-    *config = fopen(CONFIG_DIR, "wb");
+    *config = fopen(Paths::configPath().c_str(), "wb");
     char writeBuffer[65536];
     FileWriteStream os(*config, writeBuffer, sizeof(writeBuffer));
     Writer<FileWriteStream> writer(os);

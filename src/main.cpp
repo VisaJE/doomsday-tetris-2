@@ -25,7 +25,7 @@ int main()  {
     // Initialise SDL
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
-        cout << "FAIL" << endl;
+        cout << "SDL FAIL" << endl;
         return 1;
     }
 
@@ -53,5 +53,3 @@ int main()  {
     SDL_Quit();
     return 0;
 }
-
-

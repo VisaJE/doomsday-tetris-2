@@ -5,10 +5,6 @@
 #include <vector>
 #include "rapidjson/document.h"
 
-#ifndef SERVER_CONFIG_NAME
-#define SERVER_CONFIG_NAME ".server_config.json"
-#endif
-
 typedef struct {
     std::string name;
     std::string value;
@@ -24,6 +20,7 @@ public:
     bool serviceEnabled;
     std::vector<ConfEntry> configuration;
 private:
+    std::string serverConfig;
     bool readConf();
     bool checkValidity(rapidjson::Document *doc);
     void setConf(rapidjson::Document *doc);

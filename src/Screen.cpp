@@ -18,38 +18,10 @@
 #include <iomanip>
 #include <fontconfig/fontconfig.h>
 #include "Log.h"
+#include "Paths.h"
 
 namespace tet {
 
-std::string Screen::findFont(const char* name)
-{
-
-    std::string fontFile = "";
-    FcConfig* config = FcInitLoadConfigAndFonts();
-
-    // configure the search pattern,
-    // assume "name" is a std::string with the desired font name in it
-    FcPattern* pat = FcNameParse((const FcChar8*)(name));
-    FcConfigSubstitute(config, pat, FcMatchPattern);
-    FcDefaultSubstitute(pat);
-
-    // find the font
-    FcResult fcResult;
-    FcPattern* font = FcFontMatch(config, pat, &fcResult);
-    if (font)
-    {
-       FcChar8* file = NULL;
-       if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
-       {
-          // save the file to another std::string
-          fontFile = (char*)file;
-       }
-       FcPatternDestroy(font);
-    }
-
-    FcPatternDestroy(pat);
-    return fontFile;
-}
 
 void Screen::setSizes()
 {
@@ -108,8 +80,8 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
     TTF_Init();
     isDestroyed = false;
 
-    FONT_PATH = findFont("Cantarell-Bold");
-    if (FONT_PATH.length() == 0) FONT_PATH = findFont("Arial");
+    FONT_PATH = Paths::findFont("Cantarell-Bold");
+    if (FONT_PATH.length() == 0) FONT_PATH = Paths::findFont("Arial");
     LOG("Font path: %s\n", FONT_PATH.c_str());
 
     Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;

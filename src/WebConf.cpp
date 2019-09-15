@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <sstream>
 #include <fstream>
+#include "Paths.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -17,6 +18,7 @@ using namespace tet;
 
 WebConf::WebConf()
 {
+    serverConfig = Paths::serverConfigPath().c_str();
     configuration = std::vector<ConfEntry>();
     serviceEnabled = false;
 }
@@ -31,8 +33,9 @@ WebConf::~WebConf()
 
 bool WebConf::readConf()
 {
-    FILE* conf =fopen(SERVER_CONFIG_NAME, "rb");
+    FILE* conf =fopen(serverConfig.c_str(), "rb");
     if (!conf) {
+        LOG("No config found at %s\n", serverConfig.c_str());
         return false;
     }
     Document doc;
@@ -85,8 +88,8 @@ void WebConf::makeConf()
         defaultString << ",\n\"" << i << "\": \"\"";
     }
     defaultString << "}";
-    remove (SERVER_CONFIG_NAME);
-    std::ofstream out(SERVER_CONFIG_NAME);
+    remove (serverConfig.c_str());
+    std::ofstream out(serverConfig.c_str());
     out << defaultString.str();
     out.close();
 }
