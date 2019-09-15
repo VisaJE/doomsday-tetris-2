@@ -15,7 +15,6 @@
 #include "StaticBlock.h"
 #include "UberBlockifier.h"
 #include "Events.h"
-#include "GlobalHighscore.h"
 #include "Log.h"
 
 using namespace std;

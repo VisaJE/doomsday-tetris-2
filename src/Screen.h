@@ -11,7 +11,6 @@
 #include "Grid.h"
 #include "BoxTexture.h"
 #include <vector>
-#include <fontconfig/fontconfig.h>
 
 #ifndef SCREEN_H_
 #define SCREEN_H_
