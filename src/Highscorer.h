@@ -19,7 +19,7 @@ namespace tet {
 
 class Highscorer {
 public:
-    Highscorer(const char* hs_filename);
+    Highscorer(std::string hs_filename);
     virtual ~Highscorer();
     void getHighscore(std::string name[10], int score[10]);
     void getHighscore(std::string name[10], int score[10], Uid id[10]);
@@ -30,7 +30,7 @@ public:
     int getLowest();
 private:
     void getFromFile();
-    const char* hsFilename;
+    std::string hsFilename;
     FILE* file;
     void setFile(std::string t);
     std::string readFile();

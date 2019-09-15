@@ -18,20 +18,22 @@
 #include <vector>
 #include <climits>
 #include "UniqueIdentifier.h"
+#include "Log.h"
 using namespace std;
 using namespace rapidjson;
 namespace tet {
 
-Highscorer::Highscorer(const char* hs_filename): hsFilename(hs_filename) {
+Highscorer::Highscorer(std::string hs_filename): hsFilename(hs_filename) {
     getFromFile();
 }
 
 void Highscorer::getFromFile() {
+    LOG("Getting from file %s\n", hsFilename.c_str());
     for (int i = 0; i < 10; i++) {
         currentScore[i] = 0;
     }
     Document scoreBoard;
-    if (!fileExists(hsFilename)) setFile(prototype);
+    if (!fileExists(hsFilename.c_str())) setFile(prototype);
     else {
         try {
             string t = readFile();
@@ -173,7 +175,7 @@ void Highscorer::replaceList(std::string names[10], int scores[10], Uid ids[10])
 
 void Highscorer::refreshFile() {
     Document scoreBoard;
-    if (!fileExists(hsFilename)) setFile(prototype);
+    if (!fileExists(hsFilename.c_str())) setFile(prototype);
     else {
         scoreBoard.Parse(readFile().c_str());
         if (!validate(&scoreBoard)) setFile(prototype);
@@ -253,8 +255,9 @@ std::string decrypt(std::string const& msg, std::string const& key)
 
 void Highscorer::setFile(string t) {
     //cout << "Creating encrypted highscore file" << hsFilename << endl;
-    remove (hsFilename);
-    ofstream out(hsFilename);
+    LOG("Setting file from %s\n", hsFilename.c_str());
+    remove (hsFilename.c_str());
+    ofstream out(hsFilename.c_str());
     string enc = encrypt(t, key);
     out << enc;
     out.close();
@@ -262,7 +265,7 @@ void Highscorer::setFile(string t) {
 
 
 string Highscorer::readFile() {
-    file = fopen(hsFilename, "rb");
+    file = fopen(hsFilename.c_str(), "rb");
     stringstream s;
     char c;
     do {
