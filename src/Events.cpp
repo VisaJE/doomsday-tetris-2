@@ -32,7 +32,7 @@ Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool score
     slideSpeed(slideSpeed),
     g(g),
     currentInterval(startInterval),
-    hs(Highscorer(".hs.json")),
+    hs(Highscorer(HIGHSCORE_PATH)),
     globalHs(GlobalHighscore(&hs)),
     fairToScore(scoreable),
     startInt(startInterval),

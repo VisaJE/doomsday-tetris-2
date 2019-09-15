@@ -72,7 +72,7 @@ bool Conf::checkValidity(Document *d) {
 
 
 void Conf::fallBack(FILE* *config, rapidjson::Document *defa) {
-    *config = fopen("config.json", "wb");
+    *config = fopen(CONFIG_DIR, "wb");
     char writeBuffer[65536];
     FileWriteStream os(*config, writeBuffer, sizeof(writeBuffer));
     Writer<FileWriteStream> writer(os);

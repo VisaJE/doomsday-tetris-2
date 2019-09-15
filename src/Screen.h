@@ -11,8 +11,11 @@
 #include "Grid.h"
 #include "BoxTexture.h"
 #include <vector>
+#include <fontconfig/fontconfig.h>
+
 #ifndef SCREEN_H_
 #define SCREEN_H_
+
 
 namespace tet {
 
@@ -35,10 +38,11 @@ private:
     SDL_Window *window=NULL;
     SDL_Renderer *renderer=NULL;
     SDL_Texture *texture=NULL;
+    std::string findFont(const char* name);
+    std::string FONT_PATH;
     bool isDestroyed;
-  void setSizes();
-  void setFonts();
-  void setTexture();
+    void setSizes();
+    void setFonts(); void setTexture();
     void refresh();
     void printHelp(SDL_Rect rect);
     void printHS(SDL_Rect hsArea,string names[10], int scores[10], const char* header);

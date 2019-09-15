@@ -16,8 +16,40 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <fontconfig/fontconfig.h>
+#include "Log.h"
 
 namespace tet {
+
+std::string Screen::findFont(const char* name)
+{
+
+    std::string fontFile = "";
+    FcConfig* config = FcInitLoadConfigAndFonts();
+
+    // configure the search pattern,
+    // assume "name" is a std::string with the desired font name in it
+    FcPattern* pat = FcNameParse((const FcChar8*)(name));
+    FcConfigSubstitute(config, pat, FcMatchPattern);
+    FcDefaultSubstitute(pat);
+
+    // find the font
+    FcResult fcResult;
+    FcPattern* font = FcFontMatch(config, pat, &fcResult);
+    if (font)
+    {
+       FcChar8* file = NULL;
+       if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
+       {
+          // save the file to another std::string
+          fontFile = (char*)file;
+       }
+       FcPatternDestroy(font);
+    }
+
+    FcPatternDestroy(pat);
+    return fontFile;
+}
 
 void Screen::setSizes()
 {
@@ -67,16 +99,20 @@ void Screen::setSizes()
         infoRect.h = SCREEN_HEIGHT;
     }
     boxTexture = BoxTexture(boxSize);
-  
+
   SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 
 Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g) {
     TTF_Init();
-
     isDestroyed = false;
-  Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
+
+    FONT_PATH = findFont("Cantarell-Bold");
+    if (FONT_PATH.length() == 0) FONT_PATH = findFont("Arial");
+    LOG("Font path: %s\n", FONT_PATH.c_str());
+
+    Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
     window = SDL_CreateWindow("DoomsdayTetris-2",
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
     if (window==NULL)  {
@@ -85,7 +121,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
         throw 10;
     }
 
-  windowID = SDL_GetWindowID(window);
+    windowID = SDL_GetWindowID(window);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) {
@@ -93,21 +129,21 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
         destroy();
         throw 11;
     }
-  setSizes();
-  setTexture();
-  setFonts();
+    setSizes();
+    setTexture();
+    setFonts();
 
     textColor = {200, 200, 200};
     refresh();
 }
 void Screen::setFonts()
 {
-  if (font != NULL) TTF_CloseFont(font);
-  if (textFont != NULL) TTF_CloseFont(textFont);
-  if (scoreFont != NULL) TTF_CloseFont(scoreFont);
-  font = TTF_OpenFont("font.ttf", 30);
-    textFont = TTF_OpenFont("font.ttf", boxSize/3.0);
-    scoreFont = TTF_OpenFont("font.ttf", boxSize/1.7);
+    if (font != NULL) TTF_CloseFont(font);
+    if (textFont != NULL) TTF_CloseFont(textFont);
+    if (scoreFont != NULL) TTF_CloseFont(scoreFont);
+    font = TTF_OpenFont(FONT_PATH.c_str(), 30);
+    textFont = TTF_OpenFont(FONT_PATH.c_str(), boxSize/3.0);
+    scoreFont = TTF_OpenFont(FONT_PATH.c_str(), boxSize/1.7);
 
     if (font == NULL || textFont == NULL || scoreFont == NULL) {
         cout << "Font not found" << endl;

@@ -31,7 +31,7 @@ WebConf::~WebConf()
 
 bool WebConf::readConf()
 {
-    FILE* conf =fopen(CONFIG_NAME, "rb");
+    FILE* conf =fopen(SERVER_CONFIG_NAME, "rb");
     if (!conf) {
         return false;
     }
@@ -85,8 +85,8 @@ void WebConf::makeConf()
         defaultString << ",\n\"" << i << "\": \"\"";
     }
     defaultString << "}";
-    remove (CONFIG_NAME);
-    std::ofstream out(CONFIG_NAME);
+    remove (SERVER_CONFIG_NAME);
+    std::ofstream out(SERVER_CONFIG_NAME);
     out << defaultString.str();
     out.close();
 }

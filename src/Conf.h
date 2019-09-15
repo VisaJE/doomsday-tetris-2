@@ -13,6 +13,10 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#ifndef CONFIG_DIR
+#define CONFIG_DIR "config.json"
+#endif
+
 namespace tet {
 
 class Conf {

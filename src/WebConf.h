@@ -5,7 +5,10 @@
 #include <vector>
 #include "rapidjson/document.h"
 
-#define CONFIG_NAME ".server_config.json"
+#ifndef SERVER_CONFIG_NAME
+#define SERVER_CONFIG_NAME ".server_config.json"
+#endif
+
 typedef struct {
     std::string name;
     std::string value;
