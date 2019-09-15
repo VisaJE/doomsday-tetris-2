@@ -157,6 +157,8 @@ void Screen::setTexture()
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
   if (texture == NULL) {
       cout << "Initializing texture failed" << endl;
+      cout << "Screen width " << SCREEN_WIDTH << endl;
+      cout << "Screen height " << SCREEN_HEIGHT << endl;
       throw 12;
   }
     buffer = vector<Uint32>(SCREEN_WIDTH*SCREEN_HEIGHT, 0);

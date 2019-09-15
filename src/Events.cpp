@@ -13,6 +13,7 @@
 #include "UberBlockifier.h"
 #include <thread>
 #include "math.h"
+#include "Log.h"
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))()
 
@@ -230,40 +231,32 @@ int Events::menu() {
             }
             case SDL_MOUSEBUTTONUP:
             {
-                if (sizeCh)
-                {
-                    screen->changeSize(height, width);
-                    screen->menu(names, scores);
-                }
                 break;
             }
             case SDL_WINDOWEVENT :
             {
                 switch (event.window.event)
                 {
-                case SDL_WINDOWEVENT_RESIZED:
+                    case SDL_WINDOWEVENT_RESIZED:
                     {
-                    if (event.window.windowID == screen->windowID)
-                    {
-                        width = event.window.data1;
-                        height = event.window.data2;
+                        LOG("Resize event\n");
+                        if (event.window.windowID == screen->windowID)
+                        {
+                            width = event.window.data1;
+                            height = event.window.data2;
+                            LOG("Changed window size to %d, %d\n", width, height);
+                            sizeCh = true;
+                        }
+                        break;
                     }
-                    break;
-                    }
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
                     {
-                    sizeCh = true;
-                    break;
+                        break;
                     }
                 }
                 break;
             }
             case SDL_KEYDOWN : {
-                if (sizeCh)
-                {
-                    screen->changeSize(height, width);
-                    screen->menu(names, scores);
-                }
                 switch (event.key.keysym.sym)
                 {
                 case SDLK_RETURN :
@@ -293,6 +286,12 @@ int Events::menu() {
                 }
                 }
             }
+        }
+        if (sizeCh)
+        {
+            screen->changeSize(height, width);
+            screen->menu(names, scores);
+            sizeCh = false;
         }
     }
     return err;
