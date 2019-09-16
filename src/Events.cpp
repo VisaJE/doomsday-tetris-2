@@ -20,14 +20,6 @@
 
 namespace tet {
 
-// Call structures
-struct Tick {
-    void operator()() const
-    {
-        std::cout << "Hello, World!" << std::endl;
-    }
-};
-
 
 Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool scoreable, bool& fastDropInitiated):
     paused(true),
@@ -128,33 +120,35 @@ int Events::setHighscore() {
     bool done = false;
     if (!fairToScore) {
         screen->gameOver("Your configuration is not fair for scoring.");
-                while(!quit && !done && SDL_WaitEvent(&event)) {
-                    switch (event.type) {
-                    case SDL_QUIT: {
-                        quit = true;
-                        break;
-                    }
-                    case SDL_KEYDOWN: {
-                        done = true;
-                    }
-                    }
-                }
+        while(!quit && !done && SDL_WaitEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                quit = true;
+                break;
+
+                case SDL_KEYDOWN:
+                done = true;
+            }
+        }
         return 0;
     }
-    if (g->getPoints()<hs.getLowest()) {
+    if (g->getPoints()<hs.getLowest())
+    {
 
         screen->gameOver("Your score was not enough\nto reach the leaderboard.");
-                while(!quit && !done && SDL_WaitEvent(&event)) {
-                    switch (event.type) {
-                    case SDL_QUIT: {
-                        quit = true;
-                        break;
-                    }
-                    case SDL_KEYDOWN: {
-                        done = true;
-                    }
-                    }
-                }
+        while(!quit && !done && SDL_WaitEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                quit = true;
+                break;
+
+                case SDL_KEYDOWN:
+                done = true;
+
+            }
+        }
         return 0;
     }
     string t;
@@ -162,13 +156,15 @@ int Events::setHighscore() {
     string text ="Enter your name to be\nremembered among the best:\n";
     screen->gameOver(text);
     SDL_StartTextInput();
-            while(!quit && !done && SDL_WaitEvent(&event)) {
-                switch (event.type) {
-                case SDL_QUIT: {
+            while(!quit && !done && SDL_WaitEvent(&event))
+            {
+                switch (event.type)
+                {
+                    case SDL_QUIT:
                     quit = true;
                     break;
-                }
-                case SDL_TEXTINPUT:
+
+                    case SDL_TEXTINPUT:
                     /* Add new text onto the end of our text */
                     if (len < 10) {
                         t.append(event.text.text);
@@ -176,9 +172,9 @@ int Events::setHighscore() {
                         string temp = text;
                         screen->gameOver(temp.append(t));
                     } // @suppress("No break at end of case")
-                case SDL_KEYDOWN:
+                    case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
-                    case SDLK_BACKSPACE:
+                        case SDLK_BACKSPACE:
                         if (len > 0) {
                             --len;
                             if((int) t.back()< 0) t.pop_back();
@@ -187,7 +183,7 @@ int Events::setHighscore() {
                             screen->gameOver(temp.append(t));
                         }
                         break;
-                    case SDLK_RETURN :
+                        case SDLK_RETURN :
                         if (len > 0) {
                             while (t.length()> 10) {
                                 if((int) t.back()< 0) t.pop_back();
@@ -201,8 +197,8 @@ int Events::setHighscore() {
                             screen->gameOver(text);
                         }
                         break;
-
                     }
+                    break;
                 }
             }
     SDL_StopTextInput();
@@ -221,72 +217,77 @@ int Events::menu() {
     hs.getHighscore(names, scores);
     screen->menu(names, scores);
     int err = 0;
+
     bool sizeCh = false;
     int width = 0;
     int height = 0;
-    while(!quit && SDL_WaitEvent(&event)) {
-        switch (event.type) {
-            case SDL_QUIT: {
+
+    while(!quit && SDL_WaitEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_QUIT:
+            quit = true;
+            break;
+
+            case SDL_MOUSEBUTTONUP:
+            break;
+
+            case SDL_WINDOWEVENT :
+            switch (event.window.event)
+            {
+                case SDL_WINDOWEVENT_RESIZED:
+                {
+                    LOG("Resize event\n");
+                    if (event.window.windowID == screen->windowID)
+                    {
+                        width = event.window.data1;
+                        height = event.window.data2;
+                        LOG("Changed window size to %d, %d\n", width, height);
+                        sizeCh = true;
+                    }
+                    break;
+                }
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                {
+                    break;
+                }
+                default:
+                {
+                    LOG("Refreshing\n");
+                    screen->menu(names, scores);
+                }
+            }
+            break;
+
+            case SDL_KEYDOWN :
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_RETURN :
+                err = init();
+                if (g->lost && err == 0)
+                {
+                    err = setHighscore();
+                    g->reset();
+                    while (callQue.size()!=0)
+                    {
+                      callQue.pop();
+                    }
+                }
+                hs.getHighscore(names, scores);
+                screen->menu(names, scores);
+                break;
+
+                case SDLK_g :
+                globalScoreList();
+                screen->menu(names, scores);
+                break;
+
+                case SDLK_q:
                 quit = true;
                 break;
             }
-            case SDL_MOUSEBUTTONUP:
-            {
-                break;
-            }
-            case SDL_WINDOWEVENT :
-            {
-                switch (event.window.event)
-                {
-                    case SDL_WINDOWEVENT_RESIZED:
-                    {
-                        LOG("Resize event\n");
-                        if (event.window.windowID == screen->windowID)
-                        {
-                            width = event.window.data1;
-                            height = event.window.data2;
-                            LOG("Changed window size to %d, %d\n", width, height);
-                            sizeCh = true;
-                        }
-                        break;
-                    }
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-            case SDL_KEYDOWN : {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_RETURN :
-                {
-                  err = init();
-                  if (g->lost && err == 0) {
-                    err = setHighscore();
-                    g->reset();
-                    while (callQue.size()!=0){
-                      callQue.pop();
-                    }
-                  }
-                  hs.getHighscore(names, scores);
-                  screen->menu(names, scores);
-                  break;
-                }
-                case SDLK_g :
-                {
-                  globalScoreList();
-                  screen->menu(names, scores);
-                  break;
-                }
-                case SDLK_q:
-                {
-                    quit = true;
-                    break;
-                }
-                }
-            }
+            break;
         }
         if (sizeCh)
         {
@@ -314,184 +315,215 @@ int Events::init() {
     dPressed = false;
     screen->printGrid();
     while (!quit) {
-        while(SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT: {
-                    std::cout << "Quitting..." << std::flush;
-                    SDL_UnlockMutex(mutex);
-                    quit = true;
-                    SDL_RemoveTimer(timer);
-                    if (aPressed) {SDL_RemoveTimer(slideLTimer);}
-                    if (dPressed) {SDL_RemoveTimer(slideRTimer);}
-                    break;
-                }
-                case SDL_KEYDOWN:  {
-                    switch (event.key.keysym.sym) {
-                    // MOVE LEFT
-                        case SDLK_a: case SDLK_LEFT: {
-                            if (!aPressed) {
-                                aPressed = true;
-                                if (SDL_LockMutex(mutex)==0) {
-                                    callQue.push(&Grid::moveL);
-                                    SDL_UnlockMutex(mutex);
-                                }
-                                slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*(1.0/slideSpeed)+40), 60), &sliderL, this);
-                            }
-                            break;
-                        }
-                        // MOVE RIGHT
-                        case SDLK_d: case SDLK_RIGHT: {
-                            if (!dPressed) {
-                                dPressed = true;
-                                if (SDL_LockMutex(mutex)==0) {
-                                    callQue.push(&Grid::moveR);
-                                    SDL_UnlockMutex(mutex);
-                                }
-                                slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*(1.0/slideSpeed)+40), 60), &sliderR, this);
-                            }
-                            break;
-                        }
-                        // INSTANT DROP
-                        case SDLK_SPACE: {
-                            if (SDL_LockMutex(mutex) == 0) {
-                                this->callQue.push(&Grid::wholeDrop);
-                                SDL_UnlockMutex(mutex);
-                            }
-                            break;
-                        }
-                        // FAST DROP
-                        case SDLK_s : case SDLK_DOWN : {
-                            if (!sPressed) {
-                                if (SDL_LockMutex(mutex) == 0) {
-                                    this->callQue.push(&Grid::wholeTick);
-                                    SDL_UnlockMutex(mutex);
-                                }
-                                SDL_RemoveTimer(timer);
-                                sPressed = true;
-                                setDropSpeed();
-                                timer =  SDL_AddTimer(currentInterval, &ticker, this);
+        while(SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                std::cout << "Quitting..." << std::flush;
+                SDL_UnlockMutex(mutex);
+                quit = true;
+                SDL_RemoveTimer(timer);
+                if (aPressed) {SDL_RemoveTimer(slideLTimer);}
+                if (dPressed) {SDL_RemoveTimer(slideRTimer);}
+                break;
 
-                            }
-                            break;
-                        }
-                        // ROTATE
-                        case SDLK_w : case SDLK_UP : {
-                            if (SDL_LockMutex(mutex)==0) {
-                                this->callQue.push(&Grid::rotate);
-                                SDL_UnlockMutex(mutex);
-                            }
-                            break;
-                        }
-                        // PAUSE
-                        case SDLK_p : {
-                            paused = true;
-                            SDL_RemoveTimer(timer);
-                            if (aPressed) {
-                                SDL_RemoveTimer(slideLTimer);
-                                aPressed = false;}
-                            if (dPressed) {SDL_RemoveTimer(slideRTimer);
-                                dPressed=false;}
-                            sPressed = false;
-                            if (pause()) {
-                                timer = SDL_AddTimer(currentInterval, &ticker, this);
-                                g->wholeTick();
-                                screen->printGrid();
-                            }
-                            break;
-                        }
-                        // RESTART
-                        case SDLK_r : {
-                            try {
-                            SDL_RemoveTimer(timer);
-                            if (aPressed) {
-                                SDL_RemoveTimer(slideLTimer);
-                                aPressed = false;}
-                            if (dPressed) {
-                                SDL_RemoveTimer(slideRTimer);
-                                dPressed = false;}
-                            SDL_LockMutex(mutex);
-                            while (!callQue.empty()) {callQue.pop();}
+                case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                // MOVE LEFT
+                    case SDLK_a: case SDLK_LEFT:
+                    if (!aPressed)
+                    {
+                        aPressed = true;
+                        if (SDL_LockMutex(mutex)==0) {
+                            callQue.push(&Grid::moveL);
                             SDL_UnlockMutex(mutex);
-                            g->reset();
-                            timer = SDL_AddTimer(startInt, &ticker, this);
-                            screen->printGrid();
-                            } catch (int i) {}
-                            speedUpdated = false;
-                            setDropSpeed();
-                            break;
-                            }
-                        // If game over go to menu.
-                        case SDLK_RETURN : {
-                            if (g->lost) {
-                                SDL_UnlockMutex(mutex);
-                                SDL_RemoveTimer(timer);
-                                if (aPressed) {
-                                    SDL_RemoveTimer(slideLTimer);
-                                    aPressed=false;
-                                }
-                                if (dPressed) {
-                                    SDL_RemoveTimer(slideRTimer);
-                                    dPressed=false;
-                                }
-                                return 0;
-                            }
-                            else break;
                         }
-                        // MENU
-                        case SDLK_ESCAPE : {
-                            SDL_UnlockMutex(mutex);
-                            SDL_RemoveTimer(timer);
-                            g->wholeTick();
-                            if (aPressed) {
-                                SDL_RemoveTimer(slideLTimer);
-                                aPressed=false;
-                            }
-                            if (dPressed) {
-                                SDL_RemoveTimer(slideRTimer);
-                                dPressed=false;
-                            }
-                            sPressed = false;
-                            return 0;
-                        }
-                        // ERROR INFO
-                        case SDLK_0 : {
-                            cout << "Debug info:" << endl << "Buttons pressed (a,s,d): " << aPressed << sPressed << dPressed << endl;
-                            cout << "Current interval: " << currentInterval << " Stack size: " << callQue.size() << endl;
-                            cout << "Game status (lost, paused, quit)" << g->lost << paused << quit << endl;
-                            cout << "Points:" << g->getPoints() << " Dropped blocks: " << g->droppedAmount() << endl;
-                        }
+                        slideLTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*(1.0/slideSpeed)+40), 60), &sliderL, this);
                     }
                     break;
-                }
-                case SDL_KEYUP : {
-                    switch (event.key.keysym.sym) {
-                        case SDLK_a: case SDLK_LEFT: {
-                            if (aPressed) {
-                                aPressed = false;
-                                SDL_RemoveTimer(slideLTimer);
-                            }
-                            break;
+
+                    // MOVE RIGHT
+                    case SDLK_d: case SDLK_RIGHT:
+                    if (!dPressed)
+                    {
+                        dPressed = true;
+                        if (SDL_LockMutex(mutex)==0)
+                        {
+                            callQue.push(&Grid::moveR);
+                            SDL_UnlockMutex(mutex);
                         }
-                        case SDLK_d: case SDLK_RIGHT: {
-                            if (dPressed) {
-                                dPressed = false;
-                                SDL_RemoveTimer(slideRTimer);
-                            }
-                            break;
-                        }
-                        case SDLK_s : case SDLK_DOWN : {
-                            if (sPressed) {
-                                SDL_RemoveTimer(timer);
-                                sPressed = false;
-                                setDropSpeed();
-                                timer =  SDL_AddTimer(currentInterval, &ticker, this);
-                            }
-                            break;
-                        }
+                        slideRTimer = SDL_AddTimer((Uint32)max((int)(currentInterval*(1.0/slideSpeed)+40), 60), &sliderR, this);
                     }
                     break;
+
+                    // INSTANT DROP
+                    case SDLK_SPACE:
+                    if (SDL_LockMutex(mutex) == 0)
+                    {
+                        this->callQue.push(&Grid::wholeDrop);
+                        SDL_UnlockMutex(mutex);
+                    }
+                    break;
+
+                    // FAST DROP
+                    case SDLK_s : case SDLK_DOWN :
+                    if (!sPressed)
+                    {
+                        if (SDL_LockMutex(mutex) == 0)
+                        {
+                            this->callQue.push(&Grid::wholeTick);
+                            SDL_UnlockMutex(mutex);
+                        }
+                        SDL_RemoveTimer(timer);
+                        sPressed = true;
+                        setDropSpeed();
+                        timer =  SDL_AddTimer(currentInterval, &ticker, this);
+
+                    }
+                    break;
+
+                    // ROTATE
+                    case SDLK_w : case SDLK_UP :
+                    if (SDL_LockMutex(mutex)==0) {
+                        this->callQue.push(&Grid::rotate);
+                        SDL_UnlockMutex(mutex);
+                    }
+                    break;
+
+                    // PAUSE
+                    case SDLK_p :
+                    paused = true;
+                    SDL_RemoveTimer(timer);
+                    if (aPressed)
+                    {
+                        SDL_RemoveTimer(slideLTimer);
+                        aPressed = false;
+                    }
+                    if (dPressed) {SDL_RemoveTimer(slideRTimer);
+                        dPressed=false;
+                    }
+                    sPressed = false;
+                    if (pause())
+                    {
+                        timer = SDL_AddTimer(currentInterval, &ticker, this);
+                        g->wholeTick();
+                        screen->printGrid();
+                    }
+                    break;
+
+                    // RESTART
+                    case SDLK_r :
+                    try
+                    {
+                        SDL_RemoveTimer(timer);
+                        if (aPressed)
+                        {
+                            SDL_RemoveTimer(slideLTimer);
+                            aPressed = false;
+                        }
+                        if (dPressed)
+                        {
+                            SDL_RemoveTimer(slideRTimer);
+                            dPressed = false;
+                        }
+                        SDL_LockMutex(mutex);
+                        while (!callQue.empty()) {callQue.pop();}
+                        SDL_UnlockMutex(mutex);
+                        g->reset();
+                        timer = SDL_AddTimer(startInt, &ticker, this);
+                        screen->printGrid();
+                    }
+                    catch (int i) {}
+                    speedUpdated = false;
+                    setDropSpeed();
+                    break;
+
+                    // If game over go to menu.
+                    case SDLK_RETURN :
+                    if (g->lost)
+                    {
+                        SDL_UnlockMutex(mutex);
+                        SDL_RemoveTimer(timer);
+                        if (aPressed)
+                        {
+                            SDL_RemoveTimer(slideLTimer);
+                            aPressed=false;
+                        }
+                        if (dPressed)
+                        {
+                            SDL_RemoveTimer(slideRTimer);
+                            dPressed=false;
+                        }
+                        return 0;
+                    }
+                    else break;
+
+                    // MENU
+                    case SDLK_ESCAPE :
+                    SDL_UnlockMutex(mutex);
+                    SDL_RemoveTimer(timer);
+                    g->wholeTick();
+                    if (aPressed)
+                    {
+                        SDL_RemoveTimer(slideLTimer);
+                        aPressed=false;
+                    }
+                    if (dPressed)
+                    {
+                        SDL_RemoveTimer(slideRTimer);
+                        dPressed=false;
+                    }
+                    sPressed = false;
+                    return 0;
+
+#ifdef DEBUG
+                    // ERROR INFO
+                    case SDLK_0 :
+                    cout << "Debug info:" << endl << "Buttons pressed (a,s,d): " << aPressed << sPressed << dPressed << endl;
+                    cout << "Current interval: " << currentInterval << " Stack size: " << callQue.size() << endl;
+                    cout << "Game status (lost, paused, quit)" << g->lost << paused << quit << endl;
+                    cout << "Points:" << g->getPoints() << " Dropped blocks: " << g->droppedAmount() << endl;
+#endif
+
                 }
-                default : {
+                break;
+
+                case SDL_KEYUP :
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_a: case SDLK_LEFT:
+                    if (aPressed)
+                    {
+                        aPressed = false;
+                        SDL_RemoveTimer(slideLTimer);
+                    }
+                    break;
+
+                    case SDLK_d: case SDLK_RIGHT:
+                    if (dPressed)
+                    {
+                        dPressed = false;
+                        SDL_RemoveTimer(slideRTimer);
+                    }
+                    break;
+
+                    case SDLK_s : case SDLK_DOWN :
+                    if (sPressed)
+                    {
+                        SDL_RemoveTimer(timer);
+                        sPressed = false;
+                        setDropSpeed();
+                        timer =  SDL_AddTimer(currentInterval, &ticker, this);
+                    }
+                    break;
+
+                }
+                break;
+
+                default :
+                {
                 }
             }
 
@@ -500,9 +532,12 @@ int Events::init() {
         setDropSpeed();
 
         // Do the next thing on call queue.
-        try {
-            if (SDL_LockMutex(mutex)==0) {
-                if (!callQue.empty() && !g->lost) {
+        try
+        {
+            if (SDL_LockMutex(mutex)==0)
+            {
+                if (!callQue.empty() && !g->lost)
+                {
                     Grid::GridFunc func = callQue.front();
                     CALL_MEMBER_FN(*g, func);
                     callQue.pop();
@@ -512,7 +547,9 @@ int Events::init() {
                 }
                 SDL_UnlockMutex(mutex);
             }
-        } catch (int e) {
+        }
+        catch (int e)
+        {
             SDL_UnlockMutex(mutex);
         }
     }
@@ -520,23 +557,30 @@ int Events::init() {
 }
 
 
-bool Events::pause() {
+bool Events::pause()
+{
     paused = true;
     screen->pause();
-        while(!quit && paused && SDL_WaitEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT: {
-                    quit = true;
+        while(!quit && paused && SDL_WaitEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                quit = true;
+                break;
+
+                case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_p:
+                    paused = false;
                     break;
                 }
-                case SDL_KEYDOWN:  {
-                    switch (event.key.keysym.sym) {
-                        case SDLK_p: {
-                            paused = false;
-                            break;
-                        }
-                    }
-                }
+
+                case SDL_WINDOWEVENT:
+                LOG("Refreshing");
+                screen->pause();
+                break;
             }
         }
     setDropSpeed();
@@ -548,23 +592,31 @@ int Events::globalScoreList()
     globalHs.updateData();
     screen->gScorePanel(globalHs.names, globalHs.scores);
     int err = 0;
-        while(!quit && SDL_WaitEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT: {
+        while(!quit && SDL_WaitEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT:
                 quit = true;
                 break;
-            }
-            case SDL_KEYDOWN : {
+
+                case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
-                case SDLK_RETURN : {
+                {
+                    case SDLK_RETURN:
+                    return err;
+                    break;
+
+                    case SDLK_ESCAPE:
                     return err;
                     break;
                 }
-                case SDLK_ESCAPE : {
-                    return err;
-                    break;
-                }
-            }
+                break;
+
+                case SDL_WINDOWEVENT:
+                LOG("Refreshing\n");
+                screen->gScorePanel(globalHs.names, globalHs.scores);
+                break;
             }
         }
     return err;
