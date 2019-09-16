@@ -230,6 +230,9 @@ int Events::menu() {
             quit = true;
             break;
 
+            case SDL_MOUSEBUTTONDOWN:
+            break;
+
             case SDL_MOUSEBUTTONUP:
             break;
 
