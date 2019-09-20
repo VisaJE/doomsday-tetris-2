@@ -49,7 +49,6 @@ private:
     bool dPressed = false;
     bool pause();
     void setDropSpeed();
-
 };
 
 } /* namespace tet */

@@ -211,6 +211,7 @@ Highscorer& Events::getLocalHighscores()
     return hs;
 }
 
+
 int Events::menu() {
     string names[10];
     int scores[10];
@@ -218,86 +219,85 @@ int Events::menu() {
     screen->menu(names, scores);
     int err = 0;
 
-    bool sizeCh = false;
-    int width = 0;
     int height = 0;
+    int width = 0;
 
-    while(!quit && SDL_WaitEvent(&event))
+    while(!quit)
     {
-        switch (event.type)
+        auto happening = SDL_WaitEventTimeout(&event, 200);
+
+        if (bool(happening) && SDL_LockMutex(mutex) == 0)
         {
-            case SDL_QUIT:
-            quit = true;
-            break;
-
-            case SDL_MOUSEBUTTONDOWN:
-            break;
-
-            case SDL_MOUSEBUTTONUP:
-            break;
-
-            case SDL_WINDOWEVENT :
-            switch (event.window.event)
+            switch (event.type)
             {
-                case SDL_WINDOWEVENT_RESIZED:
+                case SDL_QUIT:
+                quit = true;
+                break;
+
+                case SDL_MOUSEBUTTONDOWN:
+                break;
+                case SDL_MOUSEBUTTONUP:
+                break;
+
+                case SDL_WINDOWEVENT :
+                switch (event.window.event)
                 {
+                    case SDL_WINDOWEVENT_RESIZED:
                     LOG("Resize event\n");
                     if (event.window.windowID == screen->windowID)
                     {
                         width = event.window.data1;
                         height = event.window.data2;
-                        LOG("Changed window size to %d, %d\n", width, height);
-                        sizeCh = true;
+                        screen->changeSize(height, width);
                     }
                     break;
-                }
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                {
+
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
                     break;
-                }
-                default:
-                {
+
+                    default:
                     LOG("Refreshing\n");
                     screen->menu(names, scores);
                 }
-            }
-            break;
+                break;
 
-            case SDL_KEYDOWN :
-            switch (event.key.keysym.sym)
-            {
-                case SDLK_RETURN :
-                err = init();
-                if (g->lost && err == 0)
+                case SDL_KEYDOWN :
+                switch (event.key.keysym.sym)
                 {
-                    err = setHighscore();
-                    g->reset();
-                    while (callQue.size()!=0)
+                    case SDLK_RETURN :
+                    err = init();
+                    if (g->lost && err == 0)
                     {
-                      callQue.pop();
+                        err = setHighscore();
+                        g->reset();
+                        while (callQue.size()!=0)
+                        {
+                          callQue.pop();
+                        }
                     }
+                    hs.getHighscore(names, scores);
+                    screen->menu(names, scores);
+                    break;
+
+                    case SDLK_g :
+                    globalScoreList();
+                    screen->menu(names, scores);
+                    break;
+
+                    case SDLK_q:
+                    LOG("Quit called");
+                    quit = true;
+                    break;
                 }
-                hs.getHighscore(names, scores);
-                screen->menu(names, scores);
-                break;
-
-                case SDLK_g :
-                globalScoreList();
-                screen->menu(names, scores);
-                break;
-
-                case SDLK_q:
-                quit = true;
                 break;
             }
-            break;
         }
-        if (sizeCh)
+        else if (SDL_LockMutex(mutex) == 0)
         {
-            screen->changeSize(height, width);
             screen->menu(names, scores);
-            sizeCh = false;
         }
+
+        SDL_UnlockMutex(mutex);
     }
     return err;
 }
