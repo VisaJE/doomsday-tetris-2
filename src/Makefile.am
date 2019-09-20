@@ -5,6 +5,7 @@ bin_PROGRAMS = doomsdayTetris
 
 doomsdayTetris_SOURCES = main.cpp\
 						Log.h\
+						ProcessTimer.h\
 						Block.h Block.cpp\
 						BoxTexture.h BoxTexture.cpp\
 						Conf.h Conf.cpp\

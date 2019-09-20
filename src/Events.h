@@ -14,6 +14,7 @@
 #include "Highscorer.h"
 #include "GlobalHighscore.h"
 #include "queue"
+#include "ProcessTimer.h"
 
 namespace tet {
 
@@ -49,7 +50,6 @@ private:
     bool dPressed = false;
     bool pause();
     void setDropSpeed();
-
 };
 
 } /* namespace tet */
