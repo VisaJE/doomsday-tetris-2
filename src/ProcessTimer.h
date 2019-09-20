@@ -24,7 +24,7 @@ class ProcessTimer
         double getTimeSeconds()
         {
             auto timeN = clock();
-            LOG("Got time %f\n", (double) (timeN- refTime)/CLOCKS_PER_SEC);
+            //LOG("Got time %f\n", (double) (timeN- refTime)/CLOCKS_PER_SEC);
             return (double) (timeN- refTime)/CLOCKS_PER_SEC;
         }
     private:

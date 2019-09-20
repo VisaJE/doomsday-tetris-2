@@ -151,7 +151,7 @@ void Screen::changeSize(int h, int w)
     setSizes();
     setFonts();
     setTexture();
-    SDL_SetWindowSize(window, w, h);
+    //SDL_SetWindowSize(window, w, h);
 }
 
 Screen::~Screen() {

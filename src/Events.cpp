@@ -212,33 +212,6 @@ Highscorer& Events::getLocalHighscores()
     return hs;
 }
 
-struct RefreshData {
-    string* names;
-    int* scores;
-    Screen *screen;
-    ProcessTimer &dragTimer;
-    bool &changeSize;
-    int &width;
-    int &height;
-    SDL_mutex* mutex;
-};
-
-Uint32 refreshSize(Uint32 interval, void* arg)
-{
-    auto *data = (RefreshData*) arg;
-    if (SDL_LockMutex(data->mutex) == 0)
-    {
-        if (data->changeSize && data->dragTimer.getTimeSeconds() > 0.1)
-        {
-            LOG("Refreshing window size to %d, %d\n", data->width, data->height);
-            data->screen->changeSize(data->height, data->width);
-            data->changeSize = false;
-        }
-    }
-    SDL_UnlockMutex(data->mutex);
-    return interval;
-}
-
 
 int Events::menu() {
     string names[10];
@@ -250,19 +223,15 @@ int Events::menu() {
     int height = 0;
     int width = 0;
     bool changeSize = false;
+    bool commitChange = false;
     auto dragTimer = ProcessTimer();
     dragTimer.tick();
 
-    RefreshData data =
+    while(!quit)
     {
-        names, scores, screen, dragTimer, changeSize, width, height, mutex
-    };
-    SDL_TimerID timer = SDL_AddTimer(500, &refreshSize, (void*) &data);
+        auto happening = SDL_WaitEventTimeout(&event, 200);
 
-    while(!quit && SDL_WaitEvent(&event))
-    {
-
-        if (SDL_LockMutex(mutex) == 0)
+        if (bool(happening) && SDL_LockMutex(mutex) == 0)
         {
             switch (event.type)
             {
@@ -272,7 +241,6 @@ int Events::menu() {
 
                 case SDL_MOUSEBUTTONDOWN:
                 break;
-
                 case SDL_MOUSEBUTTONUP:
                 break;
 
@@ -285,8 +253,7 @@ int Events::menu() {
                     {
                         width = event.window.data1;
                         height = event.window.data2;
-                        dragTimer.tick();
-                        changeSize = true;
+                        screen->changeSize(height, width);
                     }
                     break;
 
@@ -294,8 +261,11 @@ int Events::menu() {
                     break;
 
                     default:
-                    LOG("Refreshing\n");
-                    screen->menu(names, scores);
+                    if (!changeSize)
+                    {
+                        LOG("Refreshing\n");
+                        screen->menu(names, scores);
+                    }
                 }
                 break;
 
@@ -323,15 +293,20 @@ int Events::menu() {
                     break;
 
                     case SDLK_q:
+                    LOG("Quit called");
                     quit = true;
                     break;
                 }
                 break;
             }
         }
+        else if (SDL_LockMutex(mutex) == 0)
+        {
+            screen->menu(names, scores);
+        }
+
         SDL_UnlockMutex(mutex);
     }
-    SDL_RemoveTimer(timer);
     return err;
 }
 
