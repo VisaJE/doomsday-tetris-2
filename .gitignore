@@ -19,6 +19,7 @@ Makefile.in
 *.ttf
 .cproject
 
+src/.deps
 obj/
 *.o
 Release/
