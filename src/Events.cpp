@@ -226,7 +226,7 @@ int Events::menu() {
     {
         auto happening = SDL_WaitEventTimeout(&event, 200);
 
-        if (bool(happening) && SDL_LockMutex(mutex) == 0)
+        if (bool(happening))
         {
             switch (event.type)
             {
@@ -292,12 +292,11 @@ int Events::menu() {
                 break;
             }
         }
-        else if (SDL_LockMutex(mutex) == 0)
+        else 
         {
             screen->menu(names, scores);
         }
 
-        SDL_UnlockMutex(mutex);
     }
     return err;
 }
