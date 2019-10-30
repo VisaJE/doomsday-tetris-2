@@ -343,7 +343,7 @@ int Events::init() {
                 switch (event.key.keysym.sym)
                 {
                 // MOVE LEFT
-                    case SDLK_a: case SDLK_LEFT:
+                    case SDLK_a: case SDLK_LEFT: case SDLK_j:
                     if (!aPressed)
                     {
                         aPressed = true;
@@ -356,7 +356,7 @@ int Events::init() {
                     break;
 
                     // MOVE RIGHT
-                    case SDLK_d: case SDLK_RIGHT:
+                    case SDLK_d: case SDLK_RIGHT: case SDLK_l:
                     if (!dPressed)
                     {
                         dPressed = true;
@@ -379,7 +379,7 @@ int Events::init() {
                     break;
 
                     // FAST DROP
-                    case SDLK_s : case SDLK_DOWN :
+                    case SDLK_s : case SDLK_DOWN : case SDLK_k:
                     if (!sPressed)
                     {
                         if (SDL_LockMutex(mutex) == 0)
@@ -396,7 +396,7 @@ int Events::init() {
                     break;
 
                     // ROTATE
-                    case SDLK_w : case SDLK_UP :
+                    case SDLK_w : case SDLK_UP : case SDLK_i :
                     if (SDL_LockMutex(mutex)==0) {
                         this->callQue.push(&Grid::rotate);
                         SDL_UnlockMutex(mutex);
