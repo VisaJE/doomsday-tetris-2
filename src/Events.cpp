@@ -495,7 +495,7 @@ int Events::init() {
                 case SDL_KEYUP :
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_a: case SDLK_LEFT:
+                    case SDLK_a: case SDLK_LEFT: case SDLK_j:
                     if (aPressed)
                     {
                         aPressed = false;
@@ -503,7 +503,7 @@ int Events::init() {
                     }
                     break;
 
-                    case SDLK_d: case SDLK_RIGHT:
+                    case SDLK_d: case SDLK_RIGHT: case SDLK_l:
                     if (dPressed)
                     {
                         dPressed = false;
@@ -511,7 +511,7 @@ int Events::init() {
                     }
                     break;
 
-                    case SDLK_s : case SDLK_DOWN :
+                    case SDLK_s : case SDLK_DOWN : case SDLK_k:
                     if (sPressed)
                     {
                         SDL_RemoveTimer(timer);
