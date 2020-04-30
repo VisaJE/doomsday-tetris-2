@@ -1,4 +1,5 @@
 #pragma once
+#ifndef NPOSTGRES
 
 #include <iostream>
 #include <cstdio>
@@ -37,3 +38,4 @@ private:
                 };
 };
 }
+#endif

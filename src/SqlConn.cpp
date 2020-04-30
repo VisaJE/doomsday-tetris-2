@@ -1,3 +1,4 @@
+#ifndef NPOSTGRES
 #include "SqlConn.h"
 #include <iostream>
 #include <libpq-fe.h>
@@ -230,3 +231,4 @@ void SqlConn::pushList(std::string names[10], int scores[10], Uid ids[10])
     }
 }
 
+#endif

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <iostream>
+#ifndef NPOSTGRES
 #include "SqlConn.h"
 #include "WebConf.h"
+#endif
 #include "Highscorer.h"
 
 namespace tet
@@ -17,6 +19,8 @@ class GlobalHighscore
         int scores[10] = {0};
     private:
         Highscorer* context;
+#ifndef NPOSTGRES
         WebConf configuration;
+#endif
 };
 }

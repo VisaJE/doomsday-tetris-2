@@ -16,7 +16,6 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <fontconfig/fontconfig.h>
 #include "Log.h"
 #include "Paths.h"
 
@@ -80,8 +79,7 @@ Screen::Screen(int h, int w, Grid *g): SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(g
     TTF_Init();
     isDestroyed = false;
 
-    FONT_PATH = Paths::findFont("Cantarell-Bold");
-    if (FONT_PATH.length() == 0) FONT_PATH = Paths::findFont("Arial");
+    FONT_PATH = Paths::findFont("Arial");
     LOG("Font path: %s\n", FONT_PATH.c_str());
 
     Uint32 flags  = SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;

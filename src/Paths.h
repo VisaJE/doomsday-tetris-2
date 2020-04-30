@@ -3,9 +3,8 @@
 #include "Log.h"
 
 #include <iostream>
-#include <fontconfig/fontconfig.h>
 
-#include <sys/stat.h>
+#include <direct.h>
 #include <cstdlib>
 
 using namespace std;
@@ -39,66 +38,34 @@ class Paths
 
         static std::string findFont(const char* name)
         {
-            std::string fontFile = "";
-            FcConfig* config = FcInitLoadConfigAndFonts();
-
-            // configure the search pattern,
-            // assume "name" is a std::string with the desired font name in it
-            FcPattern* pat = FcNameParse((const FcChar8*)(name));
-            FcConfigSubstitute(config, pat, FcMatchPattern);
-            FcDefaultSubstitute(pat);
-
-            // find the font
-            FcResult fcResult;
-            FcPattern* font = FcFontMatch(config, pat, &fcResult);
-            if (font)
-            {
-               FcChar8* file = NULL;
-               if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
-               {
-                  // save the file to another std::string
-                  fontFile = (char*)file;
-               }
-               FcPatternDestroy(font);
-            }
-
-            FcPatternDestroy(pat);
+            std::string fontFile = getenv("WINDIR");
+            fontFile.append("/Fonts/");
+            fontFile.append(name);
+            fontFile.append(".ttf");
             return fontFile;
         }
     private:
 
         static bool pathExists(const std::string &s)
         {
-          struct stat buffer;
-          return (stat (s.c_str(), &buffer) == 0);
+          return false;
         }
 
         static void createDirs(std::string path)
         {
             if (!pathExists(path))
             {
-                std::string cmd = "mkdir -p ";
-                cmd.append(path);
-                if ( system(cmd.c_str())!= 0)
+                if (_mkdir(path.c_str()) != 0)
                 {
-                    LOG("Creating config directory failed\n");
-                }
-                if (!pathExists(path.c_str()))
-                {
-                    LOG("%s still not found\n", path.c_str());
+                    LOG("Didnt create config directory \n");
                 }
             }
         }
 
         static std::string configDir()
         {
-            const char* overrideDir = std::getenv("XDG_CONFIG_HOME");
-
-            std::string home = std::getenv("HOME");
-            std::string confDir = overrideDir ? overrideDir : home + "/.config/";
-
-            if (confDir.at(confDir.length() - 1) != '/') confDir.append("/");
-            confDir.append( "DoomsdayTetris");
+            std::string confDir = getenv("APPDATA");
+            confDir.append("/DoomsdayTetris");
 
             createDirs(confDir);
             return confDir;
@@ -106,16 +73,7 @@ class Paths
 
         static std::string dataDir()
         {
-            const char* overrideDir = std::getenv("XDG_DATA_HOME");
-
-            std::string home = std::getenv("HOME");
-            std::string confDir = overrideDir ? overrideDir : home + "/.local/share/";
-
-            if (confDir.at(confDir.length() - 1) != '/') confDir.append("/");
-            confDir.append( "DoomsdayTetris");
-
-            createDirs(confDir);
-            return confDir;
+            return configDir();
         }
 };
 }

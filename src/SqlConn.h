@@ -1,4 +1,5 @@
 #pragma once
+#ifndef NPOSTGRES
 
 #include <iostream>
 #include <libpq-fe.h>
@@ -32,3 +33,4 @@ class SqlConn {
 
 };
 }
+#endif

@@ -1,7 +1,9 @@
 #include <iostream>
 #include "GlobalHighscore.h"
+#ifndef NPOSTGRES
 #include "SqlConn.h"
 #include "WebConf.h"
+#endif
 #include <unistd.h>
 #include "Highscorer.h"
 #include "UniqueIdentifier.h"
@@ -14,6 +16,17 @@ GlobalHighscore::GlobalHighscore(Highscorer *context): context(context)
 
 bool GlobalHighscore::updateData()
 {
+#ifdef NPOSTGRES
+    names[0] = "Online";
+    names[1] = "Services";
+    names[2] = "Not";
+    names[3] = "Compiled!";
+    names[5] = "";
+    names[6] = "";
+    names[7] = "";
+    names[8] = "";
+    return false;
+#else
     configuration = WebConf();
     configuration.initiate();
     if (!configuration.serviceEnabled)
@@ -39,6 +52,7 @@ bool GlobalHighscore::updateData()
     connection.topList(names, scores);
 
     return true;
+#endif
 }
 
 GlobalHighscore::~GlobalHighscore()

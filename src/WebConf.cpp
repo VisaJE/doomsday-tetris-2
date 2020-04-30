@@ -1,3 +1,4 @@
+#ifndef NPOSTGRES
 #include "WebConf.h"
 #include <iostream>
 #include <vector>
@@ -93,3 +94,4 @@ void WebConf::makeConf()
     out << defaultString.str();
     out.close();
 }
+#endif
