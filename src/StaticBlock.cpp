@@ -57,13 +57,6 @@ return true;
 }
 
 
-void StaticBlock::refresh(vector<bool> g) {
-	for (int i = 0;i<boardWidth*boardHeight;i++) {
-		grid[i] = g[i];
-	}
-}
-
-
 void StaticBlock::reset() {
 	for (int i = 0;i<boardWidth*boardHeight;i++) {
 			grid[i] =false;

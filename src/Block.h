@@ -17,7 +17,7 @@ public:
     Block();
     int height;
     int width;
-    bool isThere(int h, int w);
+    bool isThere(int h, int w) const;
     void rotate();
     void rotateBack();
     void massCenter(int res[2]); // Mass center given (y, x)

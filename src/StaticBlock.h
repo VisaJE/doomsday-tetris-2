@@ -13,18 +13,22 @@
 #include <vector>
 
 using namespace std;
-namespace tet {
+namespace tet
+{
 
-class StaticBlock {
-public:
+class StaticBlock
+{
+  public:
     StaticBlock(vector<bool> g, const int boardHeight, const int boardWidth);
     virtual ~StaticBlock();
-    void refresh(vector<bool> g);
     bool isThere(int y, int x);
     int trim(); // returns the number of removed lines
     bool tryAdd(Block block, int h, int w);
     void reset();
-private:
+
+    template <class T> void refresh(const T &g) { std::copy(g.begin(), g.end(), grid.begin()); }
+
+  private:
     int boardHeight;
     int boardWidth;
     vector<bool> grid;

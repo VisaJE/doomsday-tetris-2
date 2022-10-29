@@ -1,4 +1,4 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
-AM_CXXFLAGS = -Wall -Wextra -DDEBUG
+AM_CXXFLAGS = -std=c++17 -Wall -Wextra -DDEBUG
 SUBDIRS = src

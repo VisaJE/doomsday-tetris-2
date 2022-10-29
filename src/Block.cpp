@@ -74,7 +74,7 @@ void Block::massCenter(int res[2]) {
 }
 
 
-bool Block::isThere(int h, int w) {
+bool Block::isThere(int h, int w) const {
     return grid[h*width + w];
 }
 } /* namespace tet */
