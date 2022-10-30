@@ -1,4 +1,0 @@
-AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I m4
-AM_CXXFLAGS = -std=c++17 -Wall -Wextra -DDEBUG
-SUBDIRS = src
