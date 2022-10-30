@@ -24,3 +24,11 @@ obj/
 *.o
 Release/
 compile
+
+.cache/
+.clangd/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+doomsday-tetris
+

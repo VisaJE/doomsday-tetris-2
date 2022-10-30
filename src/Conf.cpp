@@ -12,9 +12,18 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
 #include <cstdio>
+#include <iostream>
 #include "Paths.h"
 
 using namespace rapidjson;
+
+#ifdef WIN32
+#define READ_ACCES_SPECIFIER "rb"
+#define WRITE_ACCES_SPECIFIER "rb"
+#else
+#define READ_ACCES_SPECIFIER "r"
+#define WRITE_ACCES_SPECIFIER "r"
+#endif
 
 namespace tet {
 // Default values are set at the constructor.
@@ -22,9 +31,9 @@ Conf::Conf() {
     const char norm[] = " { \"BOARD_WIDTH\": 10 , \"BOARD_HEIGHT\": 19, \"START_INTERVAL\": 500, \"SCREEN_WIDTH\": 600, \"SCREEN_HEIGHT\": 900, \"SLIDE_SPEED\": 5 } ";
     Document defa;
     defa.Parse(norm);
-    // Ditch the b in the acces specifier for non windows systems.
-    FILE* config = fopen("config.json", "rb");
+    FILE* config = fopen(Paths::configPath().c_str(), READ_ACCES_SPECIFIER);
     if (!config) {
+        LOG("No config\n");
         fallBack(&config, &defa);
         setFromFile(&defa);
     }
@@ -34,11 +43,13 @@ Conf::Conf() {
         Document found;
         found.ParseStream(in);
         if (!checkValidity(&found)) {
+            LOG("Non valid config");
             fclose(config);
             fallBack(&config, &defa);
             setFromFile(&defa);
         }
         else {
+            LOG("Config read");
             setFromFile(&found);
             fclose(config);
         }
@@ -73,7 +84,7 @@ bool Conf::checkValidity(Document *d) {
 
 
 void Conf::fallBack(FILE* *config, rapidjson::Document *defa) {
-    *config = fopen(Paths::configPath().c_str(), "wb");
+    *config = fopen(Paths::configPath().c_str(), WRITE_ACCES_SPECIFIER);
     char writeBuffer[65536];
     FileWriteStream os(*config, writeBuffer, sizeof(writeBuffer));
     Writer<FileWriteStream> writer(os);
