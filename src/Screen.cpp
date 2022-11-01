@@ -478,7 +478,7 @@ void Screen::showBlock(const Block &block)
         const auto boxTexture = BoxTexture(boxSize);
 
         for (int i = 0; i < blockRect.w * blockRect.h; i++)
-            pixels[i] = getColor(0xff, 0xff, 0xff, 0xff);
+            pixels[i] = getColor(0,0,0,0);
 
         for (int j = 0; j < block.height; j++)
             for (int i = 0; i < block.width; i++)
