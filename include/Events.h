@@ -5,21 +5,26 @@
  *  Created on: 29.5.2018
  *      Author: Eemil
  */
-#include <iostream>
-#include <cstring>
-#include <SDL2/SDL.h>
-#include "Screen.h"
-#include "Grid.h"
-#include "UberBlockifier.h"
-#include "Highscorer.h"
 #include "GlobalHighscore.h"
+#include "Grid.h"
+#include "Highscorer.h"
+#include "Screen.h"
+#include "UberBlockifier.h"
 #include "queue"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mutex.h>
+#include <SDL2/SDL_stdinc.h>
+#include <cstring>
+#include <iostream>
 
-namespace tet {
+namespace tet
+{
 
-class Events {
-public:
-    Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable, bool &fastDropInitiated);
+class Events
+{
+  public:
+    Events(Screen *screen, Grid *g, const int startInterval, int slideSpeed, bool scoreable,
+           bool &fastDropInitiated);
     virtual ~Events();
     bool paused;
     bool quit;
@@ -33,23 +38,41 @@ public:
     Uint32 currentInterval;
     SDL_mutex *mutex;
     std::queue<Grid::GridFunc> callQue;
-    Highscorer& getLocalHighscores();
+    Highscorer &getLocalHighscores();
     Highscorer hs;
-private:
+
+  private:
     GlobalHighscore globalHs;
     bool fairToScore;
     int setHighscore();
     int startInt;
     int baseInterval;
-    bool speedUpdated =true;//Keeps track whether the base interval has been updated for this block.
+    bool speedUpdated =
+        true; // Keeps track whether the base interval has been updated for this block.
     SDL_Event event;
-    Screen* screen;
-    bool& sPressed; //sPressed is now a reference to a common bool between events and grid.
+    Screen *screen;
+    bool &sPressed; // sPressed is now a reference to a common bool between events and grid.
     bool aPressed = false;
     bool dPressed = false;
     bool pause();
     void setDropSpeed();
+
+    // Screen updating
+    SDL_mutex *screenMutex;
+    std::function<void()> screenUpdate;
+    bool invalidated = false; // If true call screenUpdate
+    SDL_TimerID updateTimer;
+    static Uint32 updateTask(Uint32 interval, void *arg);
+
+    template <typename C> void updateScreen(const C &lambda)
+    {
+        if (SDL_LockMutex(screenMutex) == 0)
+        {
+            screenUpdate = lambda;
+            invalidated = true;
+            SDL_UnlockMutex(screenMutex);
+        }
+    }
 };
 
 } /* namespace tet */
-

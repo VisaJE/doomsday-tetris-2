@@ -13,6 +13,8 @@
 #include "UberBlockifier.h"
 #include "math.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mutex.h>
+#include <SDL2/SDL_stdinc.h>
 #include <cstring>
 #include <iostream>
 #include <thread>
@@ -21,6 +23,20 @@
 
 namespace tet
 {
+
+Uint32 Events::updateTask(Uint32 interval, void *arg)
+{
+    Events *event = reinterpret_cast<Events *>(arg);
+    if (event->invalidated and event->screenUpdate)
+    {
+        if (!SDL_LockMutex(event->screenMutex))
+        {
+            event->screenUpdate();
+            SDL_UnlockMutex(event->screenMutex);
+        }
+    }
+    return interval;
+}
 
 Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool scoreable,
                bool &fastDropInitiated)
@@ -31,13 +47,22 @@ Events::Events(Screen *s, Grid *g, int startInterval, int slideSpeed, bool score
 {
     quit = false;
     mutex = SDL_CreateMutex();
-    g->onNewBlock = [this](Block &block) { this->screen->showBlock(block); };
+    screenMutex = SDL_CreateMutex();
+    updateTimer = SDL_AddTimer(16, &updateTask, this);
+    g->onNewBlock = [this](Block &block) {
+        SDL_LockMutex(screenMutex);
+        this->screen->showBlock(block);
+        SDL_UnlockMutex(screenMutex);
+    };
 }
 
 Events::~Events()
 {
+    SDL_RemoveTimer(updateTimer);
     SDL_UnlockMutex(mutex);
     SDL_DestroyMutex(mutex);
+    SDL_UnlockMutex(screenMutex);
+    SDL_DestroyMutex(screenMutex);
 }
 
 bool Events::goingLeft() { return aPressed; }
@@ -128,7 +153,8 @@ int Events::setHighscore()
     bool done = false;
     if (!fairToScore)
     {
-        screen->gameOver("Your configuration is not fair for scoring.");
+        updateScreen(
+            [this]() { this->screen->gameOver("Your configuration is not fair for scoring."); });
         while (!quit && !done && SDL_WaitEvent(&event))
         {
             switch (event.type)
@@ -143,7 +169,8 @@ int Events::setHighscore()
     if (g->getPoints() < hs.getLowest())
     {
 
-        screen->gameOver("Your score was not enough\nto reach the leaderboard.");
+        updateScreen(
+            [this]() { screen->gameOver("Your score was not enough\nto reach the leaderboard."); });
         while (!quit && !done && SDL_WaitEvent(&event))
         {
             switch (event.type)
@@ -158,7 +185,7 @@ int Events::setHighscore()
     string t;
     short len = 0;
     string text = "Enter your name to be\nremembered among the best:\n";
-    screen->gameOver(text);
+    updateScreen([this, text]() { screen->gameOver(text); });
     SDL_StartTextInput();
     while (!quit && !done && SDL_WaitEvent(&event))
     {
@@ -172,8 +199,7 @@ int Events::setHighscore()
             {
                 t.append(event.text.text);
                 ++len;
-                string temp = text;
-                screen->gameOver(temp.append(t));
+                updateScreen([this, text, t]() { screen->gameOver(text + t); });
             } // @suppress("No break at end of case")
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
@@ -185,8 +211,7 @@ int Events::setHighscore()
                     if ((int)t.back() < 0)
                         t.pop_back();
                     t.pop_back();
-                    string temp = text;
-                    screen->gameOver(temp.append(t));
+                    updateScreen([this, text, t]() { screen->gameOver(text + t); });
                 }
                 break;
             case SDLK_RETURN:
@@ -204,7 +229,7 @@ int Events::setHighscore()
                 else
                 {
                     text = "Enter even something to be\nremembered among the best:\n";
-                    screen->gameOver(text);
+                    updateScreen([this, text, t]() { screen->gameOver(text); });
                 }
                 break;
             }
@@ -222,7 +247,16 @@ int Events::menu()
     string names[10];
     int scores[10];
     hs.getHighscore(names, scores);
-    screen->menu(names, scores);
+
+    auto showMenu = [this, &names, &scores]() {
+        if (SDL_LockMutex(screenMutex) == 0)
+        {
+            screen->menu(names, scores);
+            SDL_UnlockMutex(screenMutex);
+        }
+    };
+    showMenu();
+
     int err = 0;
 
     int height = 0;
@@ -250,13 +284,17 @@ int Events::menu()
                     {
                         width = event.window.data1;
                         height = event.window.data2;
-                        screen->changeSize(height, width);
+                        if (SDL_LockMutex(screenMutex) == 0)
+                        {
+                            screen->changeSize(height, width);
+                            SDL_UnlockMutex(screenMutex);
+                        }
                     }
                     break;
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED: break;
 
-                default: LOG("Refreshing\n"); screen->menu(names, scores);
+                default: LOG("Refreshing\n"); showMenu();
                 }
                 break;
 
@@ -268,6 +306,8 @@ int Events::menu()
                     if (g->lost && err == 0)
                     {
                         err = setHighscore();
+                        if (SDL_LockMutex(screenMutex))
+                            throw 2953;
                         g->reset();
                         while (callQue.size() != 0)
                         {
@@ -275,12 +315,12 @@ int Events::menu()
                         }
                     }
                     hs.getHighscore(names, scores);
-                    screen->menu(names, scores);
+                    showMenu();
                     break;
 
                 case SDLK_g:
                     globalScoreList();
-                    screen->menu(names, scores);
+                    showMenu();
                     break;
 
                 case SDLK_q:
@@ -293,7 +333,7 @@ int Events::menu()
         }
         else
         {
-            screen->menu(names, scores);
+            showMenu();
         }
     }
     return err;
@@ -301,7 +341,10 @@ int Events::menu()
 
 int Events::init()
 {
+    if (SDL_LockMutex(screenMutex))
+        throw 420;
     g->reset();
+    SDL_UnlockMutex(screenMutex);
     speedUpdated = false;
     setDropSpeed();
     paused = false;
@@ -314,7 +357,7 @@ int Events::init()
     aPressed = false;
     sPressed = false;
     dPressed = false;
-    screen->printGrid();
+    updateScreen([this]() { this->screen->printGrid(); });
     while (!quit)
     {
         while (SDL_PollEvent(&event))
@@ -428,8 +471,11 @@ int Events::init()
                     if (pause())
                     {
                         timer = SDL_AddTimer(currentInterval, &ticker, this);
-                        g->wholeTick();
-                        screen->printGrid();
+                        if (SDL_LockMutex(screenMutex))
+                            throw 23955;
+                        this->g->wholeTick();
+                        SDL_UnlockMutex(screenMutex);
+                        updateScreen([this]() { this->screen->printGrid(); });
                     }
                     break;
 
@@ -448,15 +494,19 @@ int Events::init()
                             SDL_RemoveTimer(slideRTimer);
                             dPressed = false;
                         }
-                        SDL_LockMutex(mutex);
+                        if (SDL_LockMutex(mutex))
+                            throw 241;
                         while (!callQue.empty())
                         {
                             callQue.pop();
                         }
                         SDL_UnlockMutex(mutex);
+                        if (SDL_LockMutex(screenMutex))
+                            throw 242;
                         g->reset();
+                        SDL_UnlockMutex(screenMutex);
                         timer = SDL_AddTimer(startInt, &ticker, this);
-                        screen->printGrid();
+                        updateScreen([this]() { screen->printGrid(); });
                     }
                     catch (int i)
                     {
@@ -567,10 +617,13 @@ int Events::init()
                 if (!callQue.empty() && !g->lost)
                 {
                     Grid::GridFunc func = callQue.front();
+                    if (SDL_LockMutex(screenMutex))
+                        throw 2452;
                     CALL_MEMBER_FN(*g, func);
+                    SDL_UnlockMutex(screenMutex);
                     callQue.pop();
                     //                g.printGrid();
-                    screen->printGrid();
+                    updateScreen([this]() { screen->printGrid(); });
                 }
                 SDL_UnlockMutex(mutex);
             }
@@ -578,12 +631,13 @@ int Events::init()
         catch (int e)
         {
             SDL_UnlockMutex(mutex);
+            SDL_UnlockMutex(screenMutex);
         }
     }
 returnToMenu:
     SDL_UnlockMutex(mutex);
+    SDL_UnlockMutex(screenMutex);
     SDL_RemoveTimer(timer);
-    g->wholeTick();
     if (aPressed)
     {
         SDL_RemoveTimer(slideLTimer);
@@ -601,7 +655,7 @@ returnToMenu:
 bool Events::pause()
 {
     paused = true;
-    screen->pause();
+    updateScreen([this]() { screen->pause(); });
     while (!quit && paused && SDL_WaitEvent(&event))
     {
         switch (event.type)
@@ -616,7 +670,7 @@ bool Events::pause()
 
         case SDL_WINDOWEVENT:
             LOG("Refreshing");
-            screen->pause();
+            updateScreen([this]() { screen->pause(); });
             break;
         }
     }
@@ -627,7 +681,7 @@ bool Events::pause()
 int Events::globalScoreList()
 {
     globalHs.updateData();
-    screen->gScorePanel(globalHs.names, globalHs.scores);
+    updateScreen([this]() { screen->gScorePanel(globalHs.names, globalHs.scores); });
     int err = 0;
     while (!quit && SDL_WaitEvent(&event))
     {
@@ -646,7 +700,7 @@ int Events::globalScoreList()
 
         case SDL_WINDOWEVENT:
             LOG("Refreshing\n");
-            screen->gScorePanel(globalHs.names, globalHs.scores);
+            updateScreen([this]() { screen->gScorePanel(globalHs.names, globalHs.scores); });
             break;
         }
     }
