@@ -124,11 +124,6 @@ void Screen::setSizes()
     }
     boxTexture = BoxTexture(boxSize);
 
-    if (blockTexture)
-        SDL_DestroyTexture(blockTexture);
-    blockTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-                                     SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_WIDTH);
-
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -167,7 +162,7 @@ Screen::Screen(int h, int w, Grid *g) : SCREEN_HEIGHT(h), SCREEN_WIDTH(w), GRID(
 
     textColor = {200, 200, 200};
     SDL_Rect screenRect{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    updateFromBuffer(screenRect);
+    textureFromBuffer(screenRect);
     refresh();
 }
 
@@ -214,9 +209,16 @@ void Screen::setTexture()
             setPixel(y, x, whiteness, whiteness, 0.5 * whiteness);
         }
     }
+
+    if (blockTexture)
+        SDL_DestroyTexture(blockTexture);
+
+    blockTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                     SDL_TEXTUREACCESS_STREAMING, blockRect.h, blockRect.w);
+    SDL_SetTextureBlendMode(blockTexture, SDL_BLENDMODE_BLEND);
 }
 
-void Screen::updateFromBuffer(SDL_Rect &area)
+void Screen::textureFromBuffer(SDL_Rect &area)
 {
     try
     {
@@ -243,6 +245,7 @@ void Screen::updateFromBuffer(SDL_Rect &area)
 
 void Screen::changeSize(int h, int w)
 {
+    SDL_RenderClear(renderer);
     SCREEN_WIDTH = w;
     SCREEN_HEIGHT = h;
     setSizes();
@@ -253,8 +256,6 @@ void Screen::changeSize(int h, int w)
 
 Screen::~Screen()
 {
-    if (blockTexture)
-        SDL_DestroyTexture(blockTexture);
     destroy();
     TTF_Quit();
 }
@@ -263,18 +264,14 @@ void Screen::destroy()
 {
     if (!isDestroyed)
     {
-        if (texture != NULL)
-        {
+        if (texture != nullptr)
             SDL_DestroyTexture(texture);
-        }
-        if (renderer != NULL)
-        {
+        if (renderer != nullptr)
             SDL_DestroyRenderer(renderer);
-        }
-        if (window != NULL)
-        {
+        if (window != nullptr)
             SDL_DestroyWindow(window);
-        }
+        if (blockTexture != nullptr)
+            SDL_DestroyTexture(blockTexture);
     }
     TTF_CloseFont(font);
     TTF_CloseFont(textFont);
@@ -304,6 +301,7 @@ void Screen::printHelp(SDL_Rect rect)
 
 void Screen::menu(string names[10], int scores[10])
 {
+    SDL_RenderClear(renderer);
     SDL_SetWindowResizable(window, SDL_TRUE);
     SDL_Rect textArea{topLeft[1] + 45, static_cast<int>(bottomRight[0] - boxSize * 3.6),
                       bottomRight[1] - topLeft[1], bottomRight[0] - textArea.y};
@@ -353,6 +351,7 @@ void Screen::menu(string names[10], int scores[10])
 
 void Screen::gScorePanel(string names[10], int scores[10])
 {
+    SDL_RenderClear(renderer);
     SDL_Rect textArea{topLeft[1] + 45, static_cast<int>(bottomRight[0] - boxSize * 3.6),
                       bottomRight[1] - topLeft[1], bottomRight[0] - textArea.y};
     for (int y = topLeft[0]; y < bottomRight[0]; y++)
@@ -401,6 +400,7 @@ void Screen::gScorePanel(string names[10], int scores[10])
 
 void Screen::gameOver(string text)
 {
+    SDL_RenderClear(renderer);
     SDL_Rect r;
     r.x = topLeft[1] + 10;
     r.w = bottomRight[1] - 10 - r.x;
@@ -462,7 +462,7 @@ void Screen::printHS(SDL_Rect hsArea, string names[10], int scores[10], const ch
 
 void Screen::showBlock(const Block &block)
 {
-    updateFromBuffer(blockRect);
+    SDL_RenderClear(renderer);
     try
     {
         Uint32 *pixels;
@@ -474,6 +474,12 @@ void Screen::showBlock(const Block &block)
         }
         pitch /= sizeof(Uint32);
 
+        const auto boxSize = blockRect.w / std::max(block.height, block.width);
+        const auto boxTexture = BoxTexture(boxSize);
+
+        for (int i = 0; i < blockRect.w * blockRect.h; i++)
+            pixels[i] = getColor(0xff, 0xff, 0xff, 0xff);
+
         for (int j = 0; j < block.height; j++)
             for (int i = 0; i < block.width; i++)
             {
@@ -483,33 +489,22 @@ void Screen::showBlock(const Block &block)
                             pixels[(j * boxSize + y) * pitch + i * boxSize + x] =
                                 getColor(boxTexture.getIntensity(y, x) / 2,
                                          boxTexture.getIntensity(y, x), 50);
-                else
-                    for (int x = 0; x < boxSize; x++)
-                        for (int y = 0; y < boxSize; y++)
-                            pixels[(j * boxSize + y) * pitch + i * boxSize + x] =
-                                getColor(0xFF, 0xFF, 0xFF, 0);
             }
 
         SDL_UnlockTexture(blockTexture);
-        SDL_Rect inRect{0, 0, block.width * boxSize, block.height * boxSize};
-        SDL_Rect outRect{blockRect};
-        if (block.width > block.height)
-            outRect.h = outRect.h * block.height / block.width;
-        else
-            outRect.w = outRect.w * block.width / block.height;
-        SDL_SetTextureBlendMode(blockTexture, SDL_BLENDMODE_BLEND);
-        SDL_RenderCopy(renderer, blockTexture, &inRect, &outRect);
     }
     catch (int i)
     {
         cout << "Grid refresh failed" << endl;
     }
-    SDL_RenderPresent(renderer);
+    printGrid();
 }
 
 void Screen::refresh()
 {
-    updateFromBuffer(infoRect);
+    textureFromBuffer(infoRect);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    SDL_RenderCopy(renderer, blockTexture, nullptr, &blockRect);
     try
     {
         stringstream text;
@@ -565,6 +560,7 @@ void Screen::setPixel(int y, int x, int r, int g, int b)
 
 void Screen::printGrid()
 {
+    SDL_RenderClear(renderer);
     SDL_SetWindowResizable(window, SDL_FALSE);
     SDL_Rect updateRect{SCREEN_WIDTH, SCREEN_HEIGHT, -SCREEN_WIDTH, -SCREEN_HEIGHT};
     const auto &changes = GRID->getChanges();
@@ -616,18 +612,18 @@ void Screen::printGrid()
             }
         }
     }
-    updateFromBuffer(updateRect);
+    textureFromBuffer(updateRect);
     refresh();
 }
 
 void Screen::pause()
 {
+    SDL_RenderClear(renderer);
     for (int y = topLeft[0]; y < bottomRight[0]; y++)
         for (int x = topLeft[1]; x < bottomRight[1]; x++)
             setPixel(y, x, 10, 10, 50);
 
     SDL_UpdateTexture(texture, NULL, &buffer[0], SCREEN_WIDTH * sizeof(Uint32));
-    SDL_RenderClear(renderer);
 
     stringstream text;
 
@@ -644,8 +640,7 @@ void Screen::pause()
     }
     string t = text.str();
     const char *finalText = t.c_str();
-    SDL_Surface *gameInfo =
-        TTF_RenderUTF8_Blended_Wrapped(font, finalText, textColor, infoRect.w);
+    SDL_Surface *gameInfo = TTF_RenderUTF8_Blended_Wrapped(font, finalText, textColor, infoRect.w);
     SDL_Texture *message = SDL_CreateTextureFromSurface(renderer, gameInfo);
     int texW, texH;
     SDL_QueryTexture(message, NULL, NULL, &texW, &texH);

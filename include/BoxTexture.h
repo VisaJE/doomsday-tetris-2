@@ -16,7 +16,7 @@ public:
     BoxTexture();
     BoxTexture(int width);
     virtual ~BoxTexture();
-    int getIntensity(int y,int x);
+    int getIntensity(int y,int x) const;
 private:
     int width;
     std::vector<int> buffer;

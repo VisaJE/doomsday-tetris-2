@@ -2,8 +2,8 @@
 *Warning: This is bad c++ code*
 
 ## Installation
-* ./autogen.sh && ./configure && make && sudo make install
-* Uninstall with sudo make uninstall
+1. cmake .
+2. cmake --build . -j
 
 
 ## Introduction

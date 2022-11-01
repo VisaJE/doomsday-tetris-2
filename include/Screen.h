@@ -24,7 +24,6 @@ class Screen
     int SCREEN_HEIGHT;
     int SCREEN_WIDTH;
     Grid *GRID;
-    void destroy();
     void printGrid();
     void pause();
     void menu(string names[10], int scores[10]);
@@ -42,21 +41,17 @@ class Screen
     SDL_Renderer *renderer = NULL;
     SDL_Texture *texture = NULL;
     SDL_Texture *blockTexture = NULL;
-    std::string FONT_PATH;
-    bool isDestroyed;
-    void setSizes();
-    void setFonts();
-    void setTexture();
-    void refresh();
-    void printHelp(SDL_Rect rect);
-    void printHS(SDL_Rect hsArea, string names[10], int scores[10], const char *header);
-    void setPixel(int x, int y, int r, int g, int b);
-    void updateFromBuffer(SDL_Rect &area);
+    std::vector<Uint32> buffer;
+
     int topLeft[2]; // (y, x)
     int bottomRight[2];
     int boxSize;
+
+    std::string FONT_PATH;
+    bool isDestroyed;
+
     BoxTexture boxTexture;
-    std::vector<Uint32> buffer;
+
     TTF_Font *font = NULL;
     TTF_Font *textFont = NULL;
     TTF_Font *scoreFont = NULL;
@@ -64,6 +59,17 @@ class Screen
     SDL_Rect infoRect;
     SDL_Rect blockRect;
     bool horizontal;
+
+    void destroy();
+    void setSizes();
+    void setFonts();
+    void setTexture();
+    // Present renderer
+    void refresh();
+    void printHelp(SDL_Rect rect);
+    void printHS(SDL_Rect hsArea, string names[10], int scores[10], const char *header);
+    void setPixel(int x, int y, int r, int g, int b);
+    void textureFromBuffer(SDL_Rect &area);
 };
 
 } /* namespace tet */

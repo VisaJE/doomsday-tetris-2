@@ -35,7 +35,7 @@ BoxTexture::~BoxTexture() {
 }
 
 
-int BoxTexture::getIntensity(int y, int x) {
+int BoxTexture::getIntensity(int y, int x) const {
     return buffer[y*width+x];
 }
 } /* namespace tet */
