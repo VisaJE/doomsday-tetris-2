@@ -14,6 +14,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mutex.h>
 #include <SDL2/SDL_stdinc.h>
+#include <atomic>
 #include <cstring>
 #include <iostream>
 
@@ -60,18 +61,23 @@ class Events
     // Screen updating
     SDL_mutex *screenMutex;
     std::function<void()> screenUpdate;
-    bool invalidated = false; // If true call screenUpdate
+    std::atomic<bool> invalidated;
     SDL_TimerID updateTimer;
     static Uint32 updateTask(Uint32 interval, void *arg);
 
     template <typename C> void updateScreen(const C &lambda)
     {
-        if (SDL_LockMutex(screenMutex) == 0)
+        if (!invalidated) // Lock is not needed if screenUpdate is not accessed.
         {
-            screenUpdate = lambda;
-            invalidated = true;
-            SDL_UnlockMutex(screenMutex);
+            if (SDL_LockMutex(screenMutex) == 0)
+            {
+                screenUpdate = lambda;
+                SDL_UnlockMutex(screenMutex);
+            }
         }
+        else
+            screenUpdate = lambda;
+        invalidated = true;
     }
 };
 

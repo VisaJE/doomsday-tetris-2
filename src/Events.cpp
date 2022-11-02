@@ -27,13 +27,15 @@ namespace tet
 Uint32 Events::updateTask(Uint32 interval, void *arg)
 {
     Events *event = reinterpret_cast<Events *>(arg);
-    if (event->invalidated and event->screenUpdate)
+    if (event->invalidated)
     {
         if (!SDL_LockMutex(event->screenMutex))
         {
-            event->screenUpdate();
+            if (event->screenUpdate)
+                event->screenUpdate();
             SDL_UnlockMutex(event->screenMutex);
         }
+        event->invalidated = false;
     }
     return interval;
 }
